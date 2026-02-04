@@ -1,0 +1,12 @@
+services:
+  miniflow:
+    image: ${DOCKER_REGISTRY-}miniflow
+    build:
+      context: Miniflow
+      dockerfile: Dockerfile
+  db:
+     image: postgres:16
+     ports:
+     - 5432:5432
+     environment:
+     - POSTGRES_PASSWORD=postgres
