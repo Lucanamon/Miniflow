@@ -1,59 +1,106 @@
-# Miniflow
+# Miniflow Monorepo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
+A monorepo workspace containing the Miniflow application with frontend and backend components.
 
-## Development server
+## Workspace Structure
 
-To start a local development server, run:
-
-```bash
-ng serve
+```
+Miniflow/
+├── projects/
+│   └── frontend/          # Angular frontend application
+├── Miniflow_Backend/      # .NET backend API
+├── package.json           # Root package.json for frontend dependencies
+├── angular.json           # Angular workspace configuration
+└── tsconfig.json          # TypeScript configuration
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Prerequisites
 
-## Code scaffolding
+- Node.js (v20.19.0+ or v22.12.0+ or v24.0.0+)
+- npm 11.6.2+
+- .NET SDK (for backend)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Frontend Development
+
+The frontend is an Angular 21 application with SSR (Server-Side Rendering) support.
+
+### Available Scripts
+
+- `npm start` or `npm run start:frontend` - Start development server
+- `npm run build` or `npm run build:frontend` - Build for development
+- `npm run build:frontend:prod` - Build for production
+- `npm run watch` - Build and watch for changes
+- `npm test` or `npm run test:frontend` - Run unit tests
+- `npm run serve:ssr:frontend` - Serve SSR build
+
+### Development Server
+
+To start the frontend development server:
 
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The application will be available at `http://localhost:4200/` and will automatically reload on file changes.
+
+### Building
+
+Build the frontend application:
+
+```bash
+# Development build
+npm run build
+
+# Production build
+npm run build:frontend:prod
+```
+
+Build artifacts will be stored in `dist/frontend/`.
+
+### Server-Side Rendering (SSR)
+
+The frontend includes SSR support. After building, you can serve the SSR version:
+
+```bash
+npm run build:frontend:prod
+npm run serve:ssr:frontend
+```
+
+## Backend Development
+
+The backend is a .NET application located in `Miniflow_Backend/`.
+
+See the backend directory for specific backend documentation.
+
+## Code Scaffolding
+
+Angular CLI includes powerful code scaffolding tools. To generate a new component:
+
+```bash
+ng generate component component-name --project=frontend
+```
+
+Or use the shorthand:
+
+```bash
+ng g c component-name --project=frontend
+```
+
+For a complete list of available schematics:
 
 ```bash
 ng generate --help
 ```
 
-## Building
+## Adding New Projects
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+To add a new Angular application to the monorepo:
 
 ```bash
-ng test
+ng generate application project-name --routing --style=scss --ssr
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
 ## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [Angular CLI Documentation](https://angular.dev/tools/cli)
+- [Angular SSR Guide](https://angular.dev/guide/ssr)
