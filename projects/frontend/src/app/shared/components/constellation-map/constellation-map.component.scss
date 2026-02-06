@@ -6,6 +6,19 @@
   flex-shrink: 0;
 }
 
+/* Core sun icon - decorative center element */
+.core-sun {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+  color: var(--star-gold, #f4d03f);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 8px rgba(244, 208, 63, 0.4));
+}
+
 /* Connection lines: golden yellow, 50% opacity */
 .connection-line {
   --line-angle: 0deg;
