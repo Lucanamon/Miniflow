@@ -20,11 +20,11 @@ export class ConstellationMapComponent {
   readonly orbitRadius = '180px';
 
   readonly satelliteNodes: ConstellationNodeConfig[] = [
-    { label: 'Daily Sky', route: '/today', angle: 0, accent: 'aurora' },
-    { label: 'Orbit', route: '/today', angle: 147, accent: 'teal' },
-    { label: 'Streak', route: '/sky', angle: 60, accent: 'gold' },
-    { label: 'Constellations', route: '/constellations', angle: 213, accent: 'violet' },
-    { label: 'Reflection', route: '/reflection', angle: 102, accent: 'teal' },
+    { label: 'Daily Sky', route: '/today', angle: 60, accent: 'aurora' },
+    { label: 'Orbit', route: '/today', angle: 102, accent: 'teal' },
+    { label: 'Streak', route: '/sky', angle: 213, accent: 'gold' },
+    { label: 'Constellations', route: '/constellations', angle: 0, accent: 'violet' },
+    { label: 'Reflection', route: '/reflection', angle: 147, accent: 'teal' },
     { label: 'Activity', route: '/sky', angle: 258, accent: 'aurora' },
     { label: 'Progress', route: '/sky', angle: 300, accent: 'gold' }
   ];
