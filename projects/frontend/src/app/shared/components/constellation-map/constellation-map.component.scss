@@ -1,4 +1,13 @@
+/* Living Constellation Core System - Cosmic gradient & radial layout */
+
+/* Design tokens */
+$core-color: #FFD76A;
+$core-inner: #FFC94D;
+$core-halo: rgba(255, 215, 120, 0.15);
+$line-color: rgba(244, 208, 63, 0.5);
+
 .constellation-map {
+  --core-glow-intensity: 1;
   position: relative;
   width: 520px;
   height: 520px;
@@ -6,20 +15,130 @@
   flex-shrink: 0;
 }
 
-/* Core sun icon - decorative center element */
-.core-sun {
+/* ----- Star Dust (optional ambient background) ----- */
+.star-dust {
+  --star-x: 50%;
+  --star-y: 50%;
+  --star-delay: 0s;
+  --star-duration: 28s;
+  position: absolute;
+  left: var(--star-x);
+  top: var(--star-y);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  filter: blur(2px);
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+  animation: starDustFade var(--star-duration) ease-in-out var(--star-delay) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-dust {
+    animation: none;
+    opacity: 0.06;
+  }
+}
+
+@keyframes starDustFade {
+  0%, 100% { opacity: 0.05; transform: translate(0, 0); }
+  50% { opacity: 0.12; transform: translate(1px, 0); }
+}
+
+/* ----- Living Constellation Core ----- */
+.constellation-core {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
   pointer-events: none;
-  color: var(--star-gold, #f4d03f);
-  opacity: 0.9;
-  filter: drop-shadow(0 0 8px rgba(244, 208, 63, 0.4));
 }
 
-/* Connection lines: golden yellow, 50% opacity */
+.core-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    $core-color 0%,
+    $core-inner 50%,
+    darken($core-inner, 8%) 100%
+  );
+  box-shadow:
+    0 0 12px rgba(255, 201, 77, calc(0.5 * var(--core-glow-intensity))),
+    0 0 24px rgba(255, 201, 77, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: solarPulse 12s ease-in-out infinite;
+}
+
+.core-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 120, 0.2) 0%,
+    $core-halo 40%,
+    transparent 70%
+  );
+  filter: blur(8px);
+  animation: solarPulseHalo 12s ease-in-out infinite;
+}
+
+.constellation-map:has(.constellation-node:hover),
+.constellation-map:has(.constellation-node:focus-visible) {
+  .core-star {
+    box-shadow:
+      0 0 14px rgba(255, 201, 77, calc(0.55 * var(--core-glow-intensity))),
+      0 0 28px rgba(255, 201, 77, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .core-halo {
+    opacity: 1.08;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .core-star,
+  .core-halo {
+    animation: none;
+  }
+}
+
+@keyframes solarPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes solarPulseHalo {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* ----- Connection lines ----- */
 .connection-line {
   --line-angle: 0deg;
   --line-length: 180px;
@@ -39,11 +158,30 @@
   transform: translateX(-50%) rotate(var(--line-angle));
   z-index: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, filter 0.25s ease;
+  transition: opacity 0.25s ease, filter 0.25s ease, width 0.25s ease;
 }
 
-/* Line highlight when any node hovered (OPTION B - lightweight) */
-.constellation-map:has(.constellation-node:hover) .connection-line {
+/* Dim all lines when any node hovered; highlight only connected line */
+.constellation-map:has(.constellation-node:hover) .connection-line,
+.constellation-map:has(.constellation-node:focus-visible) .connection-line {
+  opacity: 0.4;
+}
+
+.constellation-map:has(app-constellation-node[data-node-index="0"]:hover) .connection-line[data-node-index="0"],
+.constellation-map:has(app-constellation-node[data-node-index="0"]:focus-within) .connection-line[data-node-index="0"],
+.constellation-map:has(app-constellation-node[data-node-index="1"]:hover) .connection-line[data-node-index="1"],
+.constellation-map:has(app-constellation-node[data-node-index="1"]:focus-within) .connection-line[data-node-index="1"],
+.constellation-map:has(app-constellation-node[data-node-index="2"]:hover) .connection-line[data-node-index="2"],
+.constellation-map:has(app-constellation-node[data-node-index="2"]:focus-within) .connection-line[data-node-index="2"],
+.constellation-map:has(app-constellation-node[data-node-index="3"]:hover) .connection-line[data-node-index="3"],
+.constellation-map:has(app-constellation-node[data-node-index="3"]:focus-within) .connection-line[data-node-index="3"],
+.constellation-map:has(app-constellation-node[data-node-index="4"]:hover) .connection-line[data-node-index="4"],
+.constellation-map:has(app-constellation-node[data-node-index="4"]:focus-within) .connection-line[data-node-index="4"],
+.constellation-map:has(app-constellation-node[data-node-index="5"]:hover) .connection-line[data-node-index="5"],
+.constellation-map:has(app-constellation-node[data-node-index="5"]:focus-within) .connection-line[data-node-index="5"],
+.constellation-map:has(app-constellation-node[data-node-index="6"]:hover) .connection-line[data-node-index="6"],
+.constellation-map:has(app-constellation-node[data-node-index="6"]:focus-within) .connection-line[data-node-index="6"] {
   opacity: 1;
-  filter: brightness(1.15);
+  width: 3px;
+  filter: brightness(1.25);
 }

@@ -1,29 +1,43 @@
-<div class="constellation-map">
-  <!-- Core sun icon (decorative) -->
-  <div class="core-sun" aria-hidden="true">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="4" fill="currentColor"/>
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
+<div class="constellation-map" [style.--core-glow-intensity]="coreGlowIntensity">
+  <!-- Optional background star dust -->
+  @for (star of starDust; track star.id) {
+    <div
+      class="star-dust"
+      [style.--star-x]="star.x + '%'"
+      [style.--star-y]="star.y + '%'"
+      [style.--star-delay]="star.delay + 's'"
+      [style.--star-duration]="star.duration + 's'"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <!-- Living Constellation Core -->
+  <div class="constellation-core" aria-hidden="true">
+    <div class="core-halo"></div>
+    <div class="core-star"></div>
   </div>
-  <!-- Connection lines: center to each satellite -->
-  @for (node of satelliteNodes; track node.label) {
+
+  <!-- Connection lines -->
+  @for (node of satelliteNodes; track node.label; let i = $index) {
     <div
       class="connection-line"
+      [attr.data-node-index]="i"
       [style.--line-angle]="node.angle + 'deg'"
       [style.--line-length]="orbitRadius"
     ></div>
   }
 
   <!-- Satellite nodes -->
-  @for (node of satelliteNodes; track node.label) {
+  @for (node of satelliteNodes; track node.label; let i = $index) {
     <app-constellation-node
       [label]="node.label"
       [route]="node.route"
-      variant="default"
+      [variant]="'default'"
       [angle]="node.angle"
       [distance]="orbitRadius"
       [accent]="node.accent"
+      [nodeIndex]="i"
+      [nodeTier]="node.tier"
     />
   }
 </div>

@@ -17,6 +17,7 @@
   position: relative;
   min-width: 100px;
   padding: var(--spacing-sm) var(--spacing-md);
+  outline: none;
   /* Alice blue gradient with lavender expanding from diagram center (radial toward center) */
   background: radial-gradient(
     ellipse at var(--gradient-center-x) var(--gradient-center-y),
@@ -75,14 +76,29 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
-  /* Hover: scale, glow expand, sparkle */
-  &:hover {
+  /* Node glow hierarchy: primary (stronger), secondary (standard), passive (softer) */
+  &.tier-primary .node-glow {
+    opacity: 0.75;
+    filter: none;
+  }
+  &.tier-secondary .node-glow {
+    opacity: 0.6;
+  }
+  &.tier-passive .node-glow {
+    opacity: 0.45;
+    filter: brightness(0.95);
+  }
+
+  /* Hover / focus: scale, glow +20%, sparkle */
+  &:hover,
+  &:focus-visible {
     transform: scale(1.04);
     border-color: rgba(125, 211, 252, 0.4);
 
     .node-glow {
       opacity: 1;
       transform: scale(1.2);
+      filter: brightness(1.2);
     }
     .node-sparkle {
       opacity: 0.8;
@@ -111,6 +127,12 @@
         0 0 60px var(--cosmic-gold-soft),
         inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
+  }
+
+  /* Focus ring for keyboard - outline overlays without replacing accent glow */
+  &:focus-visible {
+    outline: 2px solid var(--cyan-soft);
+    outline-offset: 2px;
   }
 
   /* Click: quick pulse */
@@ -165,6 +187,12 @@
 
   .node-glow {
     animation: breathingGlow 10s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-node .node-glow {
+    animation: none;
   }
 }
 

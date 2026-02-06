@@ -1,5 +1,6 @@
 import { Component, input, HostBinding } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import type { NodeTier } from '../constellation-map/constellation-map.component';
 
 @Component({
   selector: 'app-constellation-node',
@@ -21,6 +22,10 @@ export class ConstellationNodeComponent {
   distance = input<string>('0');
   /** Accent color variant for cosmic variety */
   accent = input<'aurora' | 'teal' | 'violet' | 'gold'>('aurora');
+  /** Index for energy line highlight pairing */
+  nodeIndex = input<number>(0);
+  /** Glow hierarchy: primary (stronger), secondary (standard), passive (softer) */
+  nodeTier = input<NodeTier>('secondary');
 
   @HostBinding('style.--node-angle') get nodeAngle() {
     return `${this.angle()}deg`;
@@ -36,6 +41,10 @@ export class ConstellationNodeComponent {
   @HostBinding('style.--gradient-center-y') get gradientCenterY() {
     const a = (this.angle() * Math.PI) / 180;
     return `${50 + 50 * Math.cos(a)}%`;
+  }
+
+  @HostBinding('attr.data-node-index') get dataNodeIndex() {
+    return this.nodeIndex();
   }
 
   isCenter = () => this.variant() === 'center';
