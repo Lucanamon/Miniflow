@@ -4,15 +4,15 @@
 }
 
 .encouragement-banner {
-  background: var(--card-bg);
+  background: linear-gradient(180deg, rgba(167, 139, 250, 0.4) 0%, var(--violet-medium) 35%, var(--violet-dark) 70%, var(--violet-deep) 100%);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(167, 139, 250, 0.25);
   border-radius: 16px;
   padding: var(--dashboard-card-padding, var(--spacing-md));
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  box-shadow: 0 4px 6px var(--card-shadow), 0 0 20px var(--glow-cyan);
+  box-shadow: 0 4px 6px var(--card-shadow), 0 0 20px rgba(167, 139, 250, 0.2);
   position: relative;
   overflow: hidden;
 
@@ -25,10 +25,10 @@
     height: 2px;
     background: linear-gradient(90deg,
       transparent 0%,
-      var(--glow-cyan) 50%,
+      rgba(125, 211, 252, 0.4) 50%,
       transparent 100%
     );
-    opacity: 0.4;
+    opacity: 0.5;
   }
 }
 

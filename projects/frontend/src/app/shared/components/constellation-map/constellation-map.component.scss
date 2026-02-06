@@ -6,7 +6,7 @@
   flex-shrink: 0;
 }
 
-/* Connection lines: gradient fade, subtle, brighten on node hover */
+/* Connection lines: golden yellow, 50% opacity */
 .connection-line {
   --line-angle: 0deg;
   --line-length: 180px;
@@ -17,10 +17,11 @@
   height: var(--line-length);
   background: linear-gradient(
     to bottom,
-    rgba(125, 211, 252, 0.2) 0%,
-    rgba(125, 211, 252, 0.15) 40%,
-    rgba(125, 211, 252, 0.08) 100%
+    rgba(244, 208, 63, 0.5) 0%,
+    rgba(244, 208, 63, 0.4) 50%,
+    rgba(244, 208, 63, 0.35) 100%
   );
+  opacity: 0.5;
   transform-origin: center top;
   transform: translateX(-50%) rotate(var(--line-angle));
   z-index: 0;
@@ -31,5 +32,5 @@
 /* Line highlight when any node hovered (OPTION B - lightweight) */
 .constellation-map:has(.constellation-node:hover) .connection-line {
   opacity: 1;
-  filter: brightness(1.25);
+  filter: brightness(1.15);
 }

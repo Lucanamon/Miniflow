@@ -28,9 +28,15 @@
   --text-secondary: rgba(248, 249, 250, 0.8);
   --text-muted: rgba(248, 249, 250, 0.6);
 
+  /* Dark Violet Background */
+  --violet-deep: #1a0a2e;
+  --violet-dark: #2d1b4e;
+  --violet-medium: #3d2a5a;
+  --violet-light: #4a3a6a;
+
   /* Background Gradients */
-  --bg-gradient: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 50%, var(--navy-medium) 100%);
-  --navbar-gradient: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-medium) 50%, var(--navy-light) 100%);
+  --bg-gradient: linear-gradient(90deg, var(--violet-deep) 0%, var(--violet-dark) 35%, var(--violet-medium) 65%, var(--violet-dark) 100%);
+  --navbar-gradient: linear-gradient(180deg, var(--indigo-base) 0%, var(--indigo-dark) 45%, var(--indigo-darker) 100%);
 
   /* Card Colors */
   --card-bg: rgba(255, 255, 255, 0.05);
@@ -38,11 +44,29 @@
   --card-shadow: rgba(0, 0, 0, 0.2);
 
   /* Star Background Noise (Very Faint) */
-  --star-noise: rgba(125, 211, 252, 0.03);
+  --star-noise: rgba(167, 139, 250, 0.04);
 
   /* Glow Effects (Subtle) */
   --glow-cyan: rgba(125, 211, 252, 0.15);
   --glow-gold: rgba(244, 208, 63, 0.1);
+
+  /* Sapphire (for banners/cards) */
+  --sapphire-base: #0f4c81;
+  --sapphire-dark: #0a3a62;
+  --sapphire-darker: #062845;
+  --sapphire-light: #1a5c9e;
+  --sapphire-lighter: #2568b3;
+
+  /* Indigo (for header) */
+  --indigo-base: #3730a3;
+  --indigo-dark: #312e81;
+  --indigo-darker: #1e1b4b;
+
+  /* Violet / Bright Orange (constellation nodes) */
+  --violet-node: #3d2a5a;
+  --violet-node-dark: #2d1b4e;
+  --bright-orange: #ff8c42;
+  --bright-orange-soft: #ffa366;
 
   /* Constellation / Magical Fantasy Palette */
   --aurora-blue: #5ac8f0;

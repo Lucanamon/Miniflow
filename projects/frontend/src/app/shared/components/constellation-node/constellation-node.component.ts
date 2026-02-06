@@ -28,6 +28,15 @@ export class ConstellationNodeComponent {
   @HostBinding('style.--node-distance') get nodeDistance() {
     return this.distance();
   }
+  /** Gradient center toward diagram center (orange expands from center) */
+  @HostBinding('style.--gradient-center-x') get gradientCenterX() {
+    const a = (this.angle() * Math.PI) / 180;
+    return `${50 - 50 * Math.sin(a)}%`;
+  }
+  @HostBinding('style.--gradient-center-y') get gradientCenterY() {
+    const a = (this.angle() * Math.PI) / 180;
+    return `${50 + 50 * Math.cos(a)}%`;
+  }
 
   isCenter = () => this.variant() === 'center';
   isLink = () => !!this.route();
