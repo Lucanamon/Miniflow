@@ -21,7 +21,7 @@
 
   &:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   }
 
   &:not(:disabled):active {
@@ -47,41 +47,42 @@
     min-height: 52px;
   }
 
-  /* Primary Variant - Forest & River Gradient */
+  /* Primary Variant - Soft Cyan */
   &.btn-primary {
-    background: var(--forest-river-gradient);
-    color: var(--white);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--cyan-medium) 0%, var(--cyan-soft) 100%);
+    color: var(--navy-deep);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     &:not(:disabled):hover {
-      background: linear-gradient(135deg, var(--forest-light) 0%, var(--teal-light) 50%, var(--river-light) 100%);
-      box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, var(--cyan-soft) 0%, var(--cyan-light) 100%);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 15px var(--glow-cyan);
     }
   }
 
-  /* Secondary Variant - Teal */
+  /* Secondary Variant - Star Gold (Success States) */
   &.btn-secondary {
-    background: var(--teal-medium);
-    color: var(--white);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    background: var(--star-gold);
+    color: var(--navy-deep);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     &:not(:disabled):hover {
-      background: var(--teal-light);
-      box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.15);
+      background: #f5d84a;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 15px var(--glow-gold);
     }
   }
 
-  /* Outline Variant */
+  /* Outline Variant - Soft Cyan Border */
   &.btn-outline {
     background: transparent;
-    color: var(--forest-medium);
-    border: 2px solid var(--forest-medium);
+    color: var(--cyan-soft);
+    border: 2px solid rgba(125, 211, 252, 0.4);
     box-shadow: none;
 
     &:not(:disabled):hover {
-      background: var(--forest-medium);
-      color: var(--white);
-      border-color: var(--forest-medium);
+      background: rgba(125, 211, 252, 0.1);
+      color: var(--cyan-light);
+      border-color: var(--cyan-soft);
+      box-shadow: 0 0 15px var(--glow-cyan);
     }
   }
 }

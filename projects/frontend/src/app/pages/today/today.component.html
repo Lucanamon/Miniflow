@@ -1,0 +1,67 @@
+<div class="today-page">
+  <div class="page-header">
+    <h1 class="page-title">Today</h1>
+    <p class="page-subtitle">{{ incompleteTasks.length }} tasks remaining</p>
+  </div>
+
+  <div class="tasks-section">
+    @if (incompleteTasks.length > 0) {
+      <div class="task-list">
+        @for (task of incompleteTasks; track task.id) {
+          <div class="task-item">
+            <button
+              class="task-checkbox"
+              [class.completed]="task.completed"
+              (click)="toggleTask(task.id)"
+              aria-label="Toggle task completion"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                @if (task.completed) {
+                  <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                }
+              </svg>
+            </button>
+            <div class="task-content">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-meta">
+                <span>{{ task.board }}</span>
+                @if (task.dueTime) {
+                  <span>{{ task.dueTime }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (completedTasks.length > 0) {
+      <div class="completed-section">
+        <h3>Completed ({{ completedTasks.length }})</h3>
+        <div class="task-list">
+          @for (task of completedTasks; track task.id) {
+            <div class="task-item">
+              <button
+                class="task-checkbox completed"
+                (click)="toggleTask(task.id)"
+                aria-label="Toggle task completion"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="task-content">
+                <div class="task-title" style="text-decoration: line-through; color: var(--text-muted);">{{ task.title }}</div>
+                <div class="task-meta">
+                  <span>{{ task.board }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

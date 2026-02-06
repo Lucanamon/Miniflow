@@ -11,4 +11,5 @@ export class ButtonComponent {
   size = input<'sm' | 'md' | 'lg'>('md');
   disabled = input<boolean>(false);
   type = input<'button' | 'submit' | 'reset'>('button');
+  successGlow = input<boolean>(false);
 }

@@ -1,0 +1,84 @@
+<div class="today-page">
+  <!-- Minimal Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Today</h1>
+      <p class="page-subtitle">{{ incompleteTasks.length }} tasks remaining</p>
+    </div>
+  </div>
+
+  <!-- Focus Tasks -->
+  <div class="tasks-section">
+    @if (incompleteTasks.length > 0) {
+      <div class="task-list">
+        @for (task of incompleteTasks; track task.id) {
+          <div class="task-item" [class.success-glow]="justCompletedTaskId() === task.id">
+            <button 
+              class="task-checkbox" 
+              [class.completed]="task.completed"
+              [class.success-animation]="justCompletedTaskId() === task.id"
+              (click)="toggleTask(task.id)"
+              aria-label="Toggle task completion"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                @if (task.completed) {
+                  <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                }
+              </svg>
+            </button>
+            <div class="task-content">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-meta">
+                <span class="task-board">{{ task.board }}</span>
+                @if (task.dueTime) {
+                  <span class="task-time">{{ task.dueTime }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <p class="empty-title">All tasks completed! Your sky is clear.</p>
+        <p class="empty-encouragement">{{ emptyStateMessage() }}</p>
+      </div>
+    }
+
+    <!-- Completed Tasks (Collapsible) -->
+    @if (completedTasks.length > 0) {
+      <div class="completed-section">
+        <div class="completed-header">
+          <h3>Completed ({{ completedTasks.length }})</h3>
+        </div>
+        <div class="completed-tasks">
+          @for (task of completedTasks; track task.id) {
+            <div class="task-item completed">
+              <button 
+                class="task-checkbox completed" 
+                (click)="toggleTask(task.id)"
+                aria-label="Toggle task completion"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="task-content">
+                <div class="task-title">{{ task.title }}</div>
+                <div class="task-meta">
+                  <span class="task-board">{{ task.board }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,28 +1,62 @@
-/* Global Styles - Forest & River Theme */
+/* Global Styles - Starry Night Fantasy Theme */
 
 :root {
-  /* Forest Colors */
+  /* Deep Navy / Dark Blue Background Colors */
+  --navy-deep: #0a1628;
+  --navy-dark: #1a2744;
+  --navy-medium: #2a3a5a;
+  --navy-light: #3a4a6a;
+
+  /* Soft Cyan Accent */
+  --cyan-soft: #7dd3fc;
+  --cyan-medium: #5ac8f0;
+  --cyan-light: #9de0ff;
+  --cyan-glow: rgba(125, 211, 252, 0.2);
+
+  /* Star Gold (Success States) */
+  --star-gold: #f4d03f;
+  --star-gold-soft: rgba(244, 208, 63, 0.3);
+  --star-gold-glow: rgba(244, 208, 63, 0.15);
+
+  /* Soft White Text (not pure white) */
+  --white-soft: #f8f9fa;
+  --white-off: #e8eaed;
+  --white-pure: #ffffff;
+
+  /* Text Colors */
+  --text-primary: var(--white-soft);
+  --text-secondary: rgba(248, 249, 250, 0.8);
+  --text-muted: rgba(248, 249, 250, 0.6);
+
+  /* Background Gradients */
+  --bg-gradient: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-dark) 50%, var(--navy-medium) 100%);
+  --navbar-gradient: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-medium) 50%, var(--navy-light) 100%);
+
+  /* Card Colors */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(125, 211, 252, 0.1);
+  --card-shadow: rgba(0, 0, 0, 0.2);
+
+  /* Star Background Noise (Very Faint) */
+  --star-noise: rgba(125, 211, 252, 0.03);
+
+  /* Glow Effects (Subtle) */
+  --glow-cyan: rgba(125, 211, 252, 0.15);
+  --glow-gold: rgba(244, 208, 63, 0.1);
+
+  /* Legacy Colors (for compatibility) */
   --forest-dark: #1a3d1a;
   --forest-medium: #2d5a2d;
   --forest-light: #3d6b3d;
-  --forest-lighter: #4a7c4a;
   --forest-accent: #5a8f5a;
-
-  /* River Colors */
   --river-dark: #1e4d72;
   --river-medium: #2a6fa5;
   --river-light: #3a8bc8;
-  --river-lighter: #4ab3e8;
   --river-accent: #5ac8f0;
-
-  /* Teal/Green-Blue Mix (Bridge between Forest & River) */
-  --teal-dark: #2d6b5a;
   --teal-medium: #3a8b7a;
   --teal-light: #4ab3a0;
-  --teal-accent: #5ac8b5;
 
   /* Neutral Colors */
-  --white: #ffffff;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
@@ -33,11 +67,6 @@
   --gray-700: #374151;
   --gray-800: #1f2937;
   --gray-900: #111827;
-
-  /* Gradients */
-  --forest-gradient: linear-gradient(135deg, var(--forest-dark) 0%, var(--forest-medium) 50%, var(--forest-light) 100%);
-  --river-gradient: linear-gradient(135deg, var(--river-dark) 0%, var(--river-medium) 50%, var(--river-light) 100%);
-  --forest-river-gradient: linear-gradient(135deg, var(--forest-medium) 0%, var(--teal-medium) 50%, var(--river-medium) 100%);
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -64,11 +93,47 @@ html, body {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--gray-50);
-  color: var(--gray-900);
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  position: relative;
 }
 
 body {
   margin: 0;
   padding: 0;
+  
+  /* Very faint star background noise - subtle only */
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(1px 1px at 20% 30%, var(--star-noise), transparent),
+      radial-gradient(1px 1px at 60% 70%, var(--star-noise), transparent),
+      radial-gradient(0.5px 0.5px at 50% 50%, var(--star-noise), transparent),
+      radial-gradient(0.5px 0.5px at 80% 10%, var(--star-noise), transparent),
+      radial-gradient(1px 1px at 90% 60%, var(--star-noise), transparent);
+    background-size: 300% 300%;
+    background-position: 0% 0%;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+    /* Very subtle, slow animation - no distracting motion */
+    animation: subtleStarShift 60s ease-in-out infinite;
+  }
+}
+
+/* Very subtle background shift - no distracting motion */
+@keyframes subtleStarShift {
+  0%, 100% {
+    opacity: 0.3;
+    background-position: 0% 0%;
+  }
+  50% {
+    opacity: 0.5;
+    background-position: 50% 50%;
+  }
 }

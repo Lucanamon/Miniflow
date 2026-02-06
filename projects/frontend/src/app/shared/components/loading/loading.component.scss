@@ -1,0 +1,47 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+  color: var(--text-primary);
+
+  &.size-sm {
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+    }
+    .loading-message {
+      font-size: 0.875rem;
+    }
+  }
+
+  &.size-lg {
+    .loading-spinner {
+      width: 64px;
+      height: 64px;
+    }
+    .loading-message {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  color: var(--cyan-soft);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.loading-message {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
