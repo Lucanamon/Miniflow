@@ -1,0 +1,187 @@
+:host {
+  --node-angle: 0deg;
+  --node-distance: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--node-angle)) translateY(calc(-1 * var(--node-distance))) rotate(calc(-1 * var(--node-angle)));
+  z-index: 2;
+}
+
+.constellation-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-width: 100px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(
+    135deg,
+    rgba(26, 39, 68, 0.9) 0%,
+    rgba(42, 58, 90, 0.85) 50%,
+    rgba(26, 39, 68, 0.9) 100%
+  );
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: visible;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  /* Idle: soft ambient glow, cosmic gradient edge */
+  box-shadow:
+    0 0 20px var(--node-glow-idle),
+    0 0 40px rgba(125, 211, 252, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Accent border glow */
+  &.accent-aurora {
+    border-color: rgba(90, 200, 240, 0.25);
+    box-shadow:
+      0 0 20px var(--node-glow-idle),
+      0 0 40px rgba(90, 200, 240, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  &.accent-teal {
+    border-color: rgba(74, 179, 160, 0.25);
+    box-shadow:
+      0 0 20px rgba(74, 179, 160, 0.1),
+      0 0 40px rgba(74, 179, 160, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  &.accent-violet {
+    border-color: rgba(167, 139, 250, 0.25);
+    box-shadow:
+      0 0 20px rgba(167, 139, 250, 0.1),
+      0 0 40px rgba(167, 139, 250, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  &.accent-gold {
+    border-color: rgba(244, 208, 63, 0.25);
+    box-shadow:
+      0 0 20px var(--star-gold-glow),
+      0 0 40px rgba(244, 208, 63, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* Hover: scale, glow expand, sparkle */
+  &:hover {
+    transform: scale(1.04);
+    border-color: rgba(125, 211, 252, 0.4);
+
+    .node-glow {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+    .node-sparkle {
+      opacity: 0.8;
+    }
+    &.accent-aurora {
+      box-shadow:
+        0 0 30px var(--node-glow-hover),
+        0 0 60px var(--aurora-blue-soft),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    &.accent-teal {
+      box-shadow:
+        0 0 30px rgba(74, 179, 160, 0.2),
+        0 0 60px var(--mystic-teal-soft),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    &.accent-violet {
+      box-shadow:
+        0 0 30px rgba(167, 139, 250, 0.2),
+        0 0 60px var(--starlight-violet-soft),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    &.accent-gold {
+      box-shadow:
+        0 0 30px var(--star-gold-soft),
+        0 0 60px var(--cosmic-gold-soft),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  /* Click: quick pulse */
+  &:active {
+    animation: nodeClickPulse 0.15s ease;
+  }
+}
+
+/* Glow layer - expands on hover */
+.node-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  background: radial-gradient(
+    circle,
+    var(--node-glow-idle) 0%,
+    transparent 70%
+  );
+  opacity: 0.6;
+  transform: scale(1);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Star sparkle highlight - appears on hover */
+.node-sparkle {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 4px;
+  height: 4px;
+  background: var(--white-soft);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--white-soft);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.node-content {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Center node: breathing glow */
+.node-center {
+  min-width: 140px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.1rem;
+
+  .node-glow {
+    animation: breathingGlow 10s ease-in-out infinite;
+  }
+}
+
+@keyframes breathingGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes nodeClickPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

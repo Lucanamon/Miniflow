@@ -1,0 +1,22 @@
+<div class="constellation-map">
+  <!-- Connection lines: center to each satellite -->
+  @for (node of satelliteNodes; track node.label) {
+    <div
+      class="connection-line"
+      [style.--line-angle]="node.angle + 'deg'"
+      [style.--line-length]="orbitRadius"
+    ></div>
+  }
+
+  <!-- Satellite nodes -->
+  @for (node of satelliteNodes; track node.label) {
+    <app-constellation-node
+      [label]="node.label"
+      [route]="node.route"
+      variant="default"
+      [angle]="node.angle"
+      [distance]="orbitRadius"
+      [accent]="node.accent"
+    />
+  }
+</div>

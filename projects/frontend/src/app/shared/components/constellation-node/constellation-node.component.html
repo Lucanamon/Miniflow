@@ -1,0 +1,29 @@
+@if (isLink()) {
+  <a
+    [routerLink]="route()!"
+    class="constellation-node"
+    [class.node-center]="isCenter()"
+    [class.accent-aurora]="accent() === 'aurora'"
+    [class.accent-teal]="accent() === 'teal'"
+    [class.accent-violet]="accent() === 'violet'"
+    [class.accent-gold]="accent() === 'gold'"
+    (click)="$event.stopPropagation()"
+  >
+    <span class="node-glow"></span>
+    <span class="node-sparkle"></span>
+    <span class="node-content">{{ label() }}</span>
+  </a>
+} @else {
+  <div
+    class="constellation-node"
+    [class.node-center]="isCenter()"
+    [class.accent-aurora]="accent() === 'aurora'"
+    [class.accent-teal]="accent() === 'teal'"
+    [class.accent-violet]="accent() === 'violet'"
+    [class.accent-gold]="accent() === 'gold'"
+  >
+    <span class="node-glow"></span>
+    <span class="node-sparkle"></span>
+    <span class="node-content">{{ label() }}</span>
+  </div>
+}

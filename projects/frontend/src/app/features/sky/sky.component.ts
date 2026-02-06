@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { ConstellationMapComponent } from '../../shared/components/constellation-map/constellation-map.component';
 import { EncouragementBannerComponent } from '../../shared/components/encouragement-banner/encouragement-banner.component';
 import { ProgressMiniChartComponent } from '../../shared/components/progress-mini-chart/progress-mini-chart.component';
 import { RecentActivityCardComponent } from '../../shared/components/recent-activity-card/recent-activity-card.component';
@@ -13,6 +14,7 @@ import { FormsModule } from '@angular/forms';
   imports: [
     ButtonComponent,
     CardComponent,
+    ConstellationMapComponent,
     EncouragementBannerComponent,
     ProgressMiniChartComponent,
     RecentActivityCardComponent,
