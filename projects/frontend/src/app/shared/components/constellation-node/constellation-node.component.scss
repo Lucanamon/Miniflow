@@ -17,19 +17,19 @@
   position: relative;
   min-width: 100px;
   padding: var(--spacing-sm) var(--spacing-md);
-  /* Sapphire gradient with violet expanding from diagram center (radial toward center) */
+  /* Alice blue gradient with lavender expanding from diagram center (radial toward center) */
   background: radial-gradient(
     ellipse at var(--gradient-center-x) var(--gradient-center-y),
-    var(--violet-node-dark) 0%,
-    var(--violet-node) 35%,
-    var(--sapphire-base) 65%,
-    var(--sapphire-light) 85%,
-    var(--sapphire-lighter) 100%
+    var(--alice-blue) 0%,
+    var(--alice-blue-soft) 25%,
+    var(--lavender) 55%,
+    var(--lavender-soft) 80%,
+    rgba(200, 195, 230, 0.95) 100%
   );
-  border: 1px solid rgba(125, 211, 252, 0.3);
+  border: 1px solid rgba(230, 230, 250, 0.5);
   border-radius: 12px;
   text-decoration: none;
-  color: var(--text-primary);
+  color: #2d1b4e;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -154,7 +154,7 @@
 .node-content {
   position: relative;
   z-index: 1;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
 /* Center node: breathing glow */
