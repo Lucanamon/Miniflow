@@ -9,8 +9,9 @@
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: auto;
+  min-height: 100vh;
   width: 100%;
+  position: relative;
 }
 
 /* Banner/Header Styles - Deep Navy with Soft Cyan */

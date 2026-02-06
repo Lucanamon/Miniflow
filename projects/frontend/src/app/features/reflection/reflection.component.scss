@@ -5,6 +5,54 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  min-height: 100vh;
+  position: relative;
+  
+  /* Sunset/Evening Theme - Purple and Pink tones */
+  background: 
+    /* Base deep purple gradient */
+    linear-gradient(180deg, #1a0a2d 0%, #2a1a3d 25%, #3a2a4d 50%, #2a1a3d 75%, #1a0a2d 100%),
+    /* Sunset glow from top */
+    radial-gradient(ellipse at 50% 0%, 
+      rgba(186, 104, 200, 0.35) 0%,
+      rgba(156, 39, 176, 0.25) 25%,
+      rgba(186, 104, 200, 0.15) 50%,
+      transparent 70%
+    ),
+    /* Warm pink accent */
+    radial-gradient(circle at 70% 30%, rgba(236, 64, 122, 0.2) 0%, transparent 45%),
+    /* Purple ambient light */
+    radial-gradient(circle at 30% 20%, rgba(156, 39, 176, 0.15) 0%, transparent 50%);
+  
+  /* Subtle texture overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(1px 1px at 20% 30%, rgba(186, 104, 200, 0.3), transparent),
+      radial-gradient(1px 1px at 60% 70%, rgba(156, 39, 176, 0.25), transparent),
+      radial-gradient(0.5px 0.5px at 50% 50%, rgba(186, 104, 200, 0.2), transparent),
+      radial-gradient(1px 1px at 80% 10%, rgba(236, 64, 122, 0.2), transparent);
+    background-size: 300% 300%;
+    background-position: 0% 0%;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+    animation: subtleStarShift 60s ease-in-out infinite;
+  }
+  
+  z-index: 1;
+  position: relative;
+  
+  /* Content wrapper */
+  > * {
+    position: relative;
+    z-index: 2;
+  }
 }
 
 .page-header {
