@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.reflection-preview-card {
+  padding: var(--dashboard-card-padding, var(--spacing-md));
+}
+
+.card-title {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reflection-note {
+  margin: 0 0 var(--spacing-md) 0;
+  padding-left: var(--spacing-sm);
+  border-left: 2px solid rgba(125, 211, 252, 0.3);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.reflection-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.reflection-mood {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.reflection-date {
+  opacity: 0.8;
+}

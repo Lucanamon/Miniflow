@@ -1,4 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+
+/** Context types for targeted encouragement messages */
+export type EncouragementContext = 'dashboard' | 'loading' | 'empty' | 'default';
 
 @Injectable({
   providedIn: 'root'
@@ -6,7 +9,9 @@ import { Injectable, signal } from '@angular/core';
 export class EncouragementService {
   private messages = [
     "Every task you finish becomes light.",
-    "Progress is still progress.",
+    "Consistency builds constellations.",
+    "Small progress is still progress.",
+    "Momentum is created, not found.",
     "You are building momentum.",
     "Small steps create big changes.",
     "Your sky is getting brighter.",
@@ -56,5 +61,19 @@ export class EncouragementService {
 
   getMessageByIndex(index: number): string {
     return this.messages[index % this.messages.length];
+  }
+
+  /** Get message filtered by context (returns from appropriate pool or falls back to main messages) */
+  getMessageByContext(context: EncouragementContext): string {
+    switch (context) {
+      case 'loading':
+        return this.getRandomLoadingMessage();
+      case 'empty':
+        return this.getRandomEmptyStateMessage();
+      case 'dashboard':
+      case 'default':
+      default:
+        return this.getRandomMessage();
+    }
   }
 }

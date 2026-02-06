@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.encouragement-banner {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: var(--dashboard-card-padding, var(--spacing-md));
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: 0 4px 6px var(--card-shadow), 0 0 20px var(--glow-cyan);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      var(--glow-cyan) 50%,
+      transparent 100%
+    );
+    opacity: 0.4;
+  }
+}
+
+.star-icon {
+  flex-shrink: 0;
+  color: var(--star-gold);
+  filter: drop-shadow(0 0 4px var(--star-gold-soft));
+}
+
+.encouragement-text {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-style: italic;
+  transition: opacity 0.4s ease;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}

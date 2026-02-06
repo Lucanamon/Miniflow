@@ -1,0 +1,8 @@
+<div class="encouragement-banner">
+  <svg class="star-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L14.5 8.5L21 9L16 13.5L17.5 20L12 16.5L6.5 20L8 13.5L3 9L9.5 8.5L12 2Z" fill="currentColor" opacity="0.6"/>
+  </svg>
+  <p class="encouragement-text" [class.fade-out]="!isVisible()" [class.fade-in]="isVisible()">
+    {{ currentMessage() }}
+  </p>
+</div>
