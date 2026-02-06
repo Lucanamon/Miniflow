@@ -18,7 +18,7 @@ import { CardComponent } from '../../shared/components/card/card.component';
   `,
   styles: [`
     .settings-page {
-      padding: var(--spacing-md) 0;
+      padding: 10px;
       min-height: 100vh;
       position: relative;
       max-width: 800px;
