@@ -37,13 +37,14 @@ export class ConstellationMapComponent {
     { id: 8, x: 30, y: 50, delay: 7, duration: 22 }
   ];
 
+  /** Satellite nodes: angles flipped horizontally (mirrored across vertical axis). */
   readonly satelliteNodes: ConstellationNodeConfig[] = [
-    { label: 'Daily Sky', route: '/today', angle: 60, accent: 'aurora', tier: 'primary' },
-    { label: 'Orbit', route: '/today', angle: 102, accent: 'teal', tier: 'primary' },
-    { label: 'Streak', route: '/sky', angle: 213, accent: 'gold', tier: 'passive' },
+    { label: 'Daily Sky', route: '/today', angle: 300, accent: 'aurora', tier: 'primary' },
+    { label: 'Orbit', route: '/today', angle: 258, accent: 'teal', tier: 'primary' },
+    { label: 'Streak', route: '/sky', angle: 147, accent: 'gold', tier: 'passive' },
     { label: 'Constellations', route: '/constellations', angle: 0, accent: 'violet', tier: 'primary' },
-    { label: 'Reflection', route: '/reflection', angle: 147, accent: 'teal', tier: 'secondary' },
-    { label: 'Activity', route: '/sky', angle: 258, accent: 'aurora', tier: 'secondary' },
-    { label: 'Progress', route: '/sky', angle: 300, accent: 'gold', tier: 'secondary' }
+    { label: 'Reflection', route: '/reflection', angle: 213, accent: 'teal', tier: 'secondary' },
+    { label: 'Activity', route: '/sky', angle: 102, accent: 'aurora', tier: 'secondary' },
+    { label: 'Progress', route: '/sky', angle: 60, accent: 'gold', tier: 'secondary' }
   ];
 }

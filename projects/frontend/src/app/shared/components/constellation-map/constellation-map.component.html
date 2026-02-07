@@ -22,7 +22,7 @@
     <div
       class="connection-line"
       [attr.data-node-index]="i"
-      [style.--line-angle]="node.angle + 'deg'"
+      [style.--line-angle]="(node.angle + 180) + 'deg'"
       [style.--line-length]="orbitRadius"
     ></div>
   }
