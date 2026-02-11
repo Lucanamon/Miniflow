@@ -1,31 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { UsersPrismaModule } from './users/users-prisma.module';
+import { ProjectsPrismaModule } from './projects/projects-prisma.module';
+import { TasksPrismaModule } from './tasks/tasks-prisma.module';
 import { HealthController } from './health/health.controller';
 
+/**
+ * AppModule - Root module using Prisma ORM.
+ * PrismaModule is global, so PrismaService is available everywhere.
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST', 'localhost'),
-        port: parseInt(config.get('DB_PORT', '5432'), 10),
-        username: config.get('DB_USERNAME', 'postgres'),
-        password: config.get('DB_PASSWORD', 'postgres'),
-        database: config.get('DB_DATABASE', 'myappdb'),
-        autoLoadEntities: true,
-        synchronize: config.get('NODE_ENV') !== 'production',
-      }),
-    }),
-    UsersModule,
-    AuthModule,
+    PrismaModule, // Global module - provides PrismaService
+    UsersPrismaModule,
+    ProjectsPrismaModule,
+    TasksPrismaModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
