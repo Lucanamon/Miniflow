@@ -44,6 +44,11 @@
   </div>
 
   <div class="reflection-actions">
+    @if (saveSuccessMessage()) {
+      <div class="save-success-message">
+        {{ saveSuccessMessage() }}
+      </div>
+    }
     <app-button variant="primary" size="lg" (click)="saveReflection()">
       Save Reflection
     </app-button>

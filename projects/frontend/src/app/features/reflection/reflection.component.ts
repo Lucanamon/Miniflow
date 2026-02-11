@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, effect, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { EncouragementService } from '../../core/services/encouragement.service';
+import { StorageService } from '../../core/services/storage.service';
 
 interface CompletedTask {
   id: number;
@@ -13,6 +14,9 @@ interface CompletedTask {
 
 type MoodTag = 'productive' | 'challenging' | 'satisfying' | 'calm' | 'energetic';
 
+const STORAGE_KEY_REFLECTION_NOTE = 'miniflow_reflection_note';
+const STORAGE_KEY_REFLECTION_MOODS = 'miniflow_reflection_moods';
+
 @Component({
   selector: 'app-reflection',
   standalone: true,
@@ -20,7 +24,10 @@ type MoodTag = 'productive' | 'challenging' | 'satisfying' | 'calm' | 'energetic
   templateUrl: './reflection.component.html',
   styleUrl: './reflection.component.scss'
 })
-export class ReflectionComponent {
+export class ReflectionComponent implements OnInit {
+  private storage = inject(StorageService);
+  private encouragementService = inject(EncouragementService);
+
   completedTasks = signal<CompletedTask[]>([
     { id: 1, title: 'Review project proposal', board: 'Work Projects', completedAt: '9:30 AM' },
     { id: 2, title: 'Team standup meeting', board: 'Work Projects', completedAt: '11:15 AM' },
@@ -30,9 +37,36 @@ export class ReflectionComponent {
   dailyNote = signal('');
   selectedMoods = signal<MoodTag[]>([]);
   emptyStateMessage = signal('');
+  saveSuccessMessage = signal('');
 
-  constructor(private encouragementService: EncouragementService) {
+  constructor() {
     this.emptyStateMessage.set(this.encouragementService.getRandomEmptyStateMessage());
+  }
+
+  ngOnInit() {
+    // Load saved data from storage
+    const savedNote = this.storage.get<string>(STORAGE_KEY_REFLECTION_NOTE);
+    const savedMoods = this.storage.get<MoodTag[]>(STORAGE_KEY_REFLECTION_MOODS);
+
+    if (savedNote) {
+      this.dailyNote.set(savedNote);
+    }
+    if (savedMoods) {
+      this.selectedMoods.set(savedMoods);
+    }
+
+    // Auto-save daily note on changes
+    effect(() => {
+      const note = this.dailyNote();
+      if (note !== null) {
+        this.storage.set(STORAGE_KEY_REFLECTION_NOTE, note);
+      }
+    });
+
+    // Auto-save moods on changes
+    effect(() => {
+      this.storage.set(STORAGE_KEY_REFLECTION_MOODS, this.selectedMoods());
+    });
   }
 
   moodTags: { value: MoodTag; label: string; icon: string }[] = [
@@ -54,12 +88,20 @@ export class ReflectionComponent {
   }
 
   saveReflection() {
-    // TODO: Save reflection data
-    console.log('Saving reflection:', {
+    // Data is already auto-saved via effects, but we can show confirmation
+    const reflectionData = {
       note: this.dailyNote(),
       moods: this.selectedMoods(),
-      tasksCompleted: this.completedTasks().length
-    });
+      tasksCompleted: this.completedTasks().length,
+      date: new Date().toISOString()
+    };
+
+    console.log('Reflection saved:', reflectionData);
+
     // Show success message
+    this.saveSuccessMessage.set('Reflection saved!');
+    setTimeout(() => {
+      this.saveSuccessMessage.set('');
+    }, 3000);
   }
 }

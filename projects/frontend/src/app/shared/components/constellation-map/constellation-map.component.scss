@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 /* Living Constellation Core System - Cosmic gradient & radial layout */
 
 /* Design tokens */
@@ -69,7 +71,7 @@ $line-color: rgba(244, 208, 63, 0.5);
     circle at 30% 30%,
     $core-color 0%,
     $core-inner 50%,
-    darken($core-inner, 8%) 100%
+    color.adjust($core-inner, $lightness: -8%) 100%
   );
   box-shadow:
     0 0 12px rgba(255, 201, 77, calc(0.5 * var(--core-glow-intensity))),

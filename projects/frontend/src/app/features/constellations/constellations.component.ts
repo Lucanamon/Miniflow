@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, effect, inject } from '@angular/core';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { EncouragementService } from '../../core/services/encouragement.service';
+import { StorageService } from '../../core/services/storage.service';
 
 interface Board {
   id: number;
@@ -12,6 +13,8 @@ interface Board {
   color: string;
 }
 
+const STORAGE_KEY_BOARDS = 'miniflow_boards';
+
 @Component({
   selector: 'app-constellations',
   standalone: true,
@@ -20,30 +23,42 @@ interface Board {
   styleUrl: './constellations.component.scss'
 })
 export class ConstellationsComponent {
-  boards = signal<Board[]>([
-    { id: 1, name: 'Work Projects', description: 'Professional tasks and projects', taskCount: 8, color: 'blue' },
-    { id: 2, name: 'Personal Goals', description: 'Life goals and personal development', taskCount: 5, color: 'green' }
-  ]);
+  private storage = inject(StorageService);
+  private encouragementService = inject(EncouragementService);
+
+  // Load boards from storage on init, fallback to defaults
+  boards = signal<Board[]>(
+    this.storage.get<Board[]>(STORAGE_KEY_BOARDS) ?? [
+      { id: 1, name: 'Work Projects', description: 'Professional tasks and projects', taskCount: 8, color: 'blue' },
+      { id: 2, name: 'Personal Goals', description: 'Life goals and personal development', taskCount: 5, color: 'green' }
+    ]
+  );
 
   showCreateModal = signal(false);
   newBoardName = signal('');
   newBoardDescription = signal('');
   emptyStateMessage = signal('');
 
-  constructor(private encouragementService: EncouragementService) {
+  constructor() {
+    // Auto-save boards whenever they change
+    effect(() => {
+      this.storage.set(STORAGE_KEY_BOARDS, this.boards());
+    });
+
     this.emptyStateMessage.set(this.encouragementService.getRandomEmptyStateMessage());
   }
 
   createBoard() {
     if (this.newBoardName().trim()) {
       const newBoard: Board = {
-        id: this.boards().length + 1,
+        id: Date.now(), // Use timestamp for unique IDs
         name: this.newBoardName(),
         description: this.newBoardDescription(),
         taskCount: 0,
         color: 'blue'
       };
       this.boards.update(boards => [...boards, newBoard]);
+      // Auto-saved by effect()
       this.newBoardName.set('');
       this.newBoardDescription.set('');
       this.showCreateModal.set(false);
@@ -52,6 +67,7 @@ export class ConstellationsComponent {
 
   deleteBoard(id: number) {
     this.boards.update(boards => boards.filter(board => board.id !== id));
+    // Auto-saved by effect()
   }
 
   editBoard(board: Board) {
