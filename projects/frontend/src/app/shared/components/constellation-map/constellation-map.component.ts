@@ -22,7 +22,6 @@ export class ConstellationMapComponent {
   /** Radius from center to satellite nodes (CSS) */
   readonly orbitRadius = '180px';
 
-  /** Future: user streak can increase core glow via --core-glow-intensity */
   readonly coreGlowIntensity = 1;
 
   /** Static star dust positions (max 8) for ambient background */
@@ -39,12 +38,8 @@ export class ConstellationMapComponent {
 
   /** Satellite nodes: angles flipped horizontally (mirrored across vertical axis). */
   readonly satelliteNodes: ConstellationNodeConfig[] = [
-    { label: 'Daily Sky', route: '/today', angle: 300, accent: 'aurora', tier: 'primary' },
-    { label: 'Orbit', route: '/today', angle: 258, accent: 'teal', tier: 'primary' },
-    { label: 'Streak', route: '/sky', angle: 147, accent: 'gold', tier: 'passive' },
-    { label: 'Constellations', route: '/constellations', angle: 0, accent: 'violet', tier: 'primary' },
-    { label: 'Reflection', route: '/reflection', angle: 213, accent: 'teal', tier: 'secondary' },
-    { label: 'Activity', route: '/sky', angle: 102, accent: 'aurora', tier: 'secondary' },
-    { label: 'Progress', route: '/sky', angle: 60, accent: 'gold', tier: 'secondary' }
+    { label: 'Today', route: '/today', angle: 0, accent: 'teal', tier: 'primary' },
+    { label: 'My Note', route: '/constellations', angle: 258, accent: 'violet', tier: 'primary' },
+    { label: 'Settings', route: '/settings', angle: 102, accent: 'aurora', tier: 'secondary' }
   ];
 }

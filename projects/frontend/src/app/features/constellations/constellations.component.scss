@@ -46,7 +46,7 @@
   transition: opacity 0.2s ease;
 }
 
-:host ::ng-deep .board-card:hover .board-actions {
+:host ::ng-deep .card:hover .board-actions {
   opacity: 1;
 }
 

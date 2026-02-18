@@ -19,10 +19,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/today/today.component').then(m => m.TodayComponent)
   },
   {
-    path: 'reflection',
-    loadComponent: () => import('./features/reflection/reflection.component').then(m => m.ReflectionComponent)
-  },
-  {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
   }

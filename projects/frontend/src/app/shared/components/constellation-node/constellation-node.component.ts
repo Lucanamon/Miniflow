@@ -10,7 +10,7 @@ import type { NodeTier } from '../constellation-map/constellation-map.component'
   styleUrl: './constellation-node.component.scss'
 })
 export class ConstellationNodeComponent {
-  /** Node label (e.g. "Tasks", "Streak") */
+  /** Node label (e.g. "Tasks", "My Note") */
   label = input<string>('');
   /** Route to navigate on click (empty = center, no navigation) */
   route = input<string | null>(null);

@@ -37,6 +37,10 @@ export class ConstellationsComponent {
   showCreateModal = signal(false);
   newBoardName = signal('');
   newBoardDescription = signal('');
+  showEditModal = signal(false);
+  editingBoard = signal<Board | null>(null);
+  editBoardName = signal('');
+  editBoardDescription = signal('');
   emptyStateMessage = signal('');
 
   constructor() {
@@ -70,8 +74,31 @@ export class ConstellationsComponent {
     // Auto-saved by effect()
   }
 
-  editBoard(board: Board) {
-    // TODO: Implement edit functionality
-    console.log('Editing board:', board);
+  openEditBoard(board: Board) {
+    this.editingBoard.set(board);
+    this.editBoardName.set(board.name);
+    this.editBoardDescription.set(board.description);
+    this.showEditModal.set(true);
+  }
+
+  closeEditModal() {
+    this.showEditModal.set(false);
+    this.editingBoard.set(null);
+    this.editBoardName.set('');
+    this.editBoardDescription.set('');
+  }
+
+  saveEditBoard() {
+    const board = this.editingBoard();
+    const name = this.editBoardName().trim();
+    if (!board || !name) return;
+    this.boards.update(boards =>
+      boards.map(b =>
+        b.id === board.id
+          ? { ...b, name, description: this.editBoardDescription() }
+          : b
+      )
+    );
+    this.closeEditModal();
   }
 }
