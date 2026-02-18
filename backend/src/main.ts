@@ -18,9 +18,32 @@ async function bootstrap() {
       },
     }),
   );
+  // CORS Configuration - Support both local dev and production frontend
+  const allowedOrigins = [
+    'http://localhost:4200', // Local Angular dev server
+    'https://myfrontenddomain.com', // Replace with your production frontend URL
+    // Add more production domains as needed:
+    // 'https://myapp.vercel.app',
+    // 'https://myapp.netlify.app',
+  ];
+
   app.enableCors({
-    origin: 'http://localhost:4200',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // In production, you might want to log this
+        if (process.env.NODE_ENV === 'production') {
+          console.warn(`Blocked CORS request from origin: ${origin}`);
+        }
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   const config = new DocumentBuilder()
@@ -31,7 +54,9 @@ async function bootstrap() {
   SwaggerModule.setup('swagger', app, document);
 
   await app.listen(port);
-  console.log(`NestJS backend listening on https://localhost:${port}/api`);
+  const baseUrl = process.env.BASE_URL || `http://localhost:${port}`;
+  console.log(`🚀 NestJS backend listening on ${baseUrl}/api`);
+  console.log(`📚 Swagger docs available at ${baseUrl}/swagger`);
 }
 
 bootstrap();

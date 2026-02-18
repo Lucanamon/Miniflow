@@ -69,4 +69,9 @@ export class TodayComponent {
   get completedTasks() {
     return this.tasks().filter(t => t.completed);
   }
+
+  deleteTask(id: number): void {
+    this.tasks.update(tasks => tasks.filter(task => task.id !== id));
+    // Auto-saved by effect()
+  }
 }

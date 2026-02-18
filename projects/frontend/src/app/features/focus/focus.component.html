@@ -1,0 +1,72 @@
+<div class="focus-page">
+  <!-- Exit Button -->
+  <button class="exit-btn" (click)="exitFocusMode()" title="Exit Focus Mode" aria-label="Exit Focus Mode">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <!-- Timer Section -->
+  <div class="timer-section">
+    <div class="timer-display" [class.running]="isTimerRunning()">
+      {{ formattedTime }}
+    </div>
+    <div class="timer-controls">
+      @if (isTimerRunning()) {
+        <app-button variant="outline" size="md" (click)="pauseTimer()">
+          Pause
+        </app-button>
+      } @else {
+        <app-button variant="primary" size="md" (click)="startTimer()">
+          Start
+        </app-button>
+      }
+      <app-button variant="outline" size="md" (click)="resetTimer()">
+        Reset
+      </app-button>
+    </div>
+  </div>
+
+  <!-- Current Task Section -->
+  <div class="task-section">
+    @if (currentTask; as task) {
+      <div class="focus-task-card">
+        <div class="task-header">
+          <span class="task-board">{{ task.board }}</span>
+          @if (task.dueTime) {
+            <span class="task-time">{{ task.dueTime }}</span>
+          }
+        </div>
+        <h2 class="task-title">{{ task.title }}</h2>
+        <div class="task-actions">
+          <app-button variant="primary" size="lg" (click)="completeCurrentTask()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Done
+          </app-button>
+          @if (incompleteTasks.length > 1) {
+            <app-button variant="outline" size="lg" (click)="skipTask()">
+              Skip
+            </app-button>
+          }
+        </div>
+        <div class="task-progress">
+          Task {{ currentTaskIndex() + 1 }} of {{ incompleteTasks.length }}
+        </div>
+      </div>
+    } @else {
+      <div class="empty-focus-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h2>All tasks completed!</h2>
+        <p>Great work! Take a break or add more tasks.</p>
+        <app-button variant="primary" size="md" (click)="exitFocusMode()">
+          Exit Focus Mode
+        </app-button>
+      </div>
+    }
+  </div>
+</div>

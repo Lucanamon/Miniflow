@@ -21,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent)
+  },
+  {
+    path: 'focus',
+    loadComponent: () => import('./features/focus/focus.component').then(m => m.FocusComponent)
   }
 ];

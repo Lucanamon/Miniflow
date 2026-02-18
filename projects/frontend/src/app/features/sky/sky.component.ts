@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
@@ -10,6 +10,7 @@ import { StorageService } from '../../core/services/storage.service';
 import { FormsModule } from '@angular/forms';
 
 const STORAGE_KEY_TASKS = 'miniflow_tasks';
+const STORAGE_KEY_BOARDS = 'miniflow_boards';
 
 interface Task {
   id: number;
@@ -17,6 +18,14 @@ interface Task {
   board: string;
   dueTime?: string;
   completed: boolean;
+}
+
+interface Board {
+  id: number;
+  name: string;
+  description: string;
+  taskCount: number;
+  color: string;
 }
 
 @Component({
@@ -34,22 +43,88 @@ interface Task {
   templateUrl: './sky.component.html',
   styleUrl: './sky.component.scss'
 })
-export class SkyComponent {
+export class SkyComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private storage = inject(StorageService);
+  private refreshInterval?: number;
 
   quickTaskTitle = signal('');
   showDateTimePicker = signal(false);
   taskDraftDate = signal('');
   taskDraftTime = signal('');
 
-  // Mock stats - replace with real data later
-  tasksCompletedToday = signal(3);
-  tasksInProgress = signal(5);
-  totalBoards = signal(2);
+  // Real-time stats calculated from storage
+  tasksCompletedToday = signal(0);
+  tasksInProgress = signal(0);
+  totalBoards = signal(0);
+
+  ngOnInit(): void {
+    // Initial load
+    this.updateStats();
+
+    if (typeof window !== 'undefined') {
+      // Set up real-time updates every 2 seconds (browser only, skip during SSR)
+      this.refreshInterval = window.setInterval(() => {
+        this.updateStats();
+      }, 2000);
+
+      // Listen for storage changes (e.g., from other tabs or components)
+      window.addEventListener('storage', this.handleStorageChange.bind(this));
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = undefined;
+    }
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('storage', this.handleStorageChange.bind(this));
+    }
+  }
+
+  /**
+   * Handle storage events from other tabs/windows
+   */
+  private handleStorageChange(event: StorageEvent): void {
+    if (event.key === STORAGE_KEY_TASKS || event.key === STORAGE_KEY_BOARDS) {
+      this.updateStats();
+    }
+  }
+
+  /**
+   * Update all stats from storage in real-time
+   */
+  private updateStats(): void {
+    // Get tasks from storage
+    const tasks = this.storage.get<Task[]>(STORAGE_KEY_TASKS) ?? [];
+    
+    // Calculate tasks in progress (incomplete tasks)
+    const incompleteTasks = tasks.filter(t => !t.completed);
+    this.tasksInProgress.set(incompleteTasks.length);
+    
+    // Calculate tasks completed today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tasksCompletedToday = tasks.filter(task => {
+      if (!task.completed) return false;
+      // For now, we'll count all completed tasks as "today"
+      // If you have a completedAt timestamp, use that instead
+      return true;
+    }).length;
+    this.tasksCompletedToday.set(tasksCompletedToday);
+    
+    // Get boards from storage
+    const boards = this.storage.get<Board[]>(STORAGE_KEY_BOARDS) ?? [];
+    this.totalBoards.set(boards.length);
+  }
 
   goToToday(): void {
     this.router.navigateByUrl('/today');
+  }
+
+  goToFocusMode(): void {
+    this.router.navigateByUrl('/focus');
   }
 
   openAddTaskPicker(): void {
@@ -88,6 +163,8 @@ export class SkyComponent {
       completed: false
     };
     this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+    // Immediately update stats after adding a task
+    this.updateStats();
     this.closeDateTimePicker();
   }
 
