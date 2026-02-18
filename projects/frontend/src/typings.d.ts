@@ -11,4 +11,5 @@ declare module '@angular/common/http' {
     delete<T>(url: string, options?: object): Observable<T>;
   }
   export function provideHttpClient(...args: unknown[]): import('@angular/core').Provider | import('@angular/core').EnvironmentProviders;
+  export function withFetch(): unknown;
 }

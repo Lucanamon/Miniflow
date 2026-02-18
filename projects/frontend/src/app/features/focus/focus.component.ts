@@ -4,7 +4,7 @@ import { StorageService } from '../../core/services/storage.service';
 import { ButtonComponent } from '../../shared/components/button.component';
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   board: string;
   dueTime?: string;
@@ -26,9 +26,9 @@ export class FocusComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private timerInterval: number | null = null;
 
-  // Load tasks from storage
+  // Load tasks from storage (normalize id to string)
   tasks = signal<Task[]>(
-    this.storage.get<Task[]>(STORAGE_KEY_TASKS) ?? []
+    (this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(STORAGE_KEY_TASKS) ?? []).map(t => ({ ...t, id: String(t.id) }))
   );
 
   // Timer state

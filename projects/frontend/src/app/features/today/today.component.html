@@ -9,7 +9,9 @@
 
   <!-- Focus Tasks -->
   <div class="tasks-section">
-    @if (incompleteTasks.length > 0) {
+    @if (loading()) {
+      <p class="loading-text">Loading tasks...</p>
+    } @else if (incompleteTasks.length > 0) {
       <div class="task-list">
         @for (task of incompleteTasks; track task.id) {
           <div class="task-item" [class.success-glow]="justCompletedTaskId() === task.id">

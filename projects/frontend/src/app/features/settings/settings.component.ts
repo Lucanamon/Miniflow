@@ -1,16 +1,18 @@
 import { Component } from '@angular/core';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { AuthComponent } from '../auth/auth.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CardComponent],
+  imports: [CardComponent, AuthComponent],
   template: `
     <div class="settings-page">
       <div class="page-header">
         <h1 class="page-title">Settings</h1>
         <p class="page-subtitle">Configure your Miniflow experience</p>
       </div>
+      <app-auth />
       <app-card title="Settings" subtitle="Coming soon">
         <p>Settings configuration will be available here.</p>
       </app-card>

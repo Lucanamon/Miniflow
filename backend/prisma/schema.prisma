@@ -22,10 +22,26 @@ model User {
 
   // Relations
   projects  Project[]
+  userTasks UserTask[] // Auth-scoped tasks for Today/Focus sync
 
   @@index([email])
   @@index([deletedAt])
   @@map("users")
+}
+
+// UserTask - Per-user tasks for Today/Focus (JWT-auth scoped)
+model UserTask {
+  id        String   @id @default(uuid())
+  title     String
+  board     String?  @default("Today")
+  dueTime   String?
+  completed Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_tasks")
 }
 
 // Project Model - Belongs to User, has many Tasks

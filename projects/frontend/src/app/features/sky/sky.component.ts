@@ -2,6 +2,8 @@ import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { AuthService } from '../../core/services/auth.service';
+import { ApiService } from '../../core/services/api.service';
 import { ConstellationMapComponent } from '../../shared/components/constellation-map/constellation-map.component';
 import { EncouragementBannerComponent } from '../../shared/components/encouragement-banner/encouragement-banner.component';
 import { ProgressMiniChartComponent } from '../../shared/components/progress-mini-chart/progress-mini-chart.component';
@@ -13,7 +15,7 @@ const STORAGE_KEY_TASKS = 'miniflow_tasks';
 const STORAGE_KEY_BOARDS = 'miniflow_boards';
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   board: string;
   dueTime?: string;
@@ -46,6 +48,8 @@ interface Board {
 export class SkyComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private storage = inject(StorageService);
+  private auth = inject(AuthService);
+  private api = inject(ApiService);
   private refreshInterval?: number;
 
   quickTaskTitle = signal('');
@@ -96,8 +100,9 @@ export class SkyComponent implements OnInit, OnDestroy {
    * Update all stats from storage in real-time
    */
   private updateStats(): void {
-    // Get tasks from storage
-    const tasks = this.storage.get<Task[]>(STORAGE_KEY_TASKS) ?? [];
+    // Get tasks from storage (normalize id to string for compatibility)
+    const raw = this.storage.get<Array<{ id: number | string; [k: string]: unknown }>>(STORAGE_KEY_TASKS) ?? [];
+    const tasks = raw.map(t => ({ ...t, id: String(t.id) })) as Task[];
     
     // Calculate tasks in progress (incomplete tasks)
     const incompleteTasks = tasks.filter(t => !t.completed);
@@ -154,17 +159,28 @@ export class SkyComponent implements OnInit, OnDestroy {
     const dueTime = this.formatDueTime(dateStr, timeStr);
 
     const existing = this.storage.get<Task[]>(STORAGE_KEY_TASKS) ?? [];
-    const maxId = existing.length ? Math.max(...existing.map(t => t.id)) : 0;
     const newTask: Task = {
-      id: maxId + 1,
+      id: String(Date.now()),
       title,
       board: 'Today',
       dueTime,
       completed: false
     };
-    this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
-    // Immediately update stats after adding a task
-    this.updateStats();
+    if (this.auth.isLoggedIn()) {
+      this.api.createTask({ title, board: 'Today', dueTime, completed: false }).subscribe({
+        next: (created) => {
+          this.storage.set(STORAGE_KEY_TASKS, [...existing, { ...newTask, id: created.id }]);
+          this.updateStats();
+        },
+        error: () => {
+          this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+          this.updateStats();
+        }
+      });
+    } else {
+      this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+      this.updateStats();
+    }
     this.closeDateTimePicker();
   }
 

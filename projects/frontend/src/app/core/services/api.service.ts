@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 // ----- Response / request interfaces -----
 
@@ -12,14 +13,20 @@ export interface HealthResponse {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
-export interface LoginResponse {
-  token: string;
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
   expiresIn?: number;
-  user?: { id: string; username: string };
+  user?: { id: string; email: string; name?: string };
 }
 
 export interface User {
@@ -47,85 +54,174 @@ export interface ApiError {
   error?: unknown;
 }
 
-/** Central API service: uses environment.apiUrl, typed endpoints, RxJS error handling. Standalone-compatible (Angular 17+). */
+export interface ApiTask {
+  id: string;
+  title: string;
+  board?: string;
+  dueTime?: string | null;
+  completed: boolean;
+  userId: string;
+  createdAt?: string;
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  board?: string;
+  dueTime?: string;
+  completed?: boolean;
+}
+
+export interface UpdateTaskRequest {
+  title?: string;
+  board?: string;
+  dueTime?: string;
+  completed?: boolean;
+}
+
+export interface DeleteTaskResponse {
+  message: string;
+}
+
+export interface UsersPaginatedResponse {
+  data: User[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+type AuthHeaders = { headers?: Record<string, string> };
+
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private readonly http: HttpClient = inject(HttpClient);
+  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly baseUrl = environment.apiUrl;
 
-  /** GET /health */
-  getHealth(): Observable<HealthResponse> {
-    return this.http.get<HealthResponse>(`${this.baseUrl}/health`).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
+  private authOptions(): AuthHeaders {
+    const token = this.auth.getToken();
+    if (!token) return {};
+    return { headers: { Authorization: 'Bearer ' + token } };
   }
 
-  /** GET /users */
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/users`).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
-  }
-
-  /** POST /auth/login */
-  login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, credentials).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
-  }
-
-  /** POST /users-prisma - Create a new user */
-  createUser(userData: CreateUserRequest): Observable<User> {
-    if (!environment.production) {
-      console.log('[API] Creating user:', userData.email);
-    }
-    return this.http.post<User>(`${this.baseUrl}/users-prisma`, userData).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
-  }
-
-  /** POST /users-prisma/save - Save progression (upsert) */
-  saveProgress(progressData: SaveProgressRequest): Observable<User> {
-    if (!environment.production) {
-      console.log('[API] Saving progress for:', progressData.email);
-    }
-    return this.http.post<User>(`${this.baseUrl}/users-prisma/save`, progressData).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
-  }
-
-  /** GET /users-prisma - Get all users with pagination */
-  getUsersPaginated(page: number = 1, limit: number = 10): Observable<{ data: User[]; total: number; page: number; limit: number }> {
-    return this.http.get<{ data: User[]; total: number; page: number; limit: number }>(
-      `${this.baseUrl}/users-prisma?page=${page}&limit=${limit}`
-    ).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
-  }
-
-  /** GET /users-prisma/:id - Get user by ID */
-  getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/users-prisma/${id}`).pipe(
-      catchError((err) => throwError(() => this.normalizeError(err)))
-    );
+  private handleError(err: unknown): never {
+    throw this.normalizeError(err);
   }
 
   private normalizeError(err: unknown): ApiError {
     if (err && typeof err === 'object' && 'error' in err) {
       const e = err as { status?: number; error?: unknown; message?: string };
-      return {
-        message: typeof e.error === 'object' && e.error !== null && 'message' in e.error
+      const msg =
+        typeof e.error === 'object' && e.error !== null && 'message' in e.error
           ? String((e.error as { message: string }).message)
-          : e.message ?? 'Request failed',
-        status: e.status,
-        error: e.error,
-      };
+          : e.message ?? 'Request failed';
+      return { message: msg, status: e.status, error: e.error };
     }
     return {
       message: err instanceof Error ? err.message : 'Request failed',
       error: err,
     };
+  }
+
+  getHealth(): Observable<HealthResponse> {
+    return this.http.get<HealthResponse>(this.baseUrl + '/health').pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.baseUrl + '/users').pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  register(data: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(this.baseUrl + '/auth/register', data).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(this.baseUrl + '/auth/login', credentials).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  getTasks(): Observable<ApiTask[]> {
+    return this.http.get<ApiTask[]>(this.baseUrl + '/tasks', this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  createTask(data: CreateTaskRequest): Observable<ApiTask> {
+    return this.http.post<ApiTask>(this.baseUrl + '/tasks', data, this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  updateTask(id: string, data: UpdateTaskRequest): Observable<ApiTask> {
+    return this.http
+      .patch<ApiTask>(this.baseUrl + '/tasks/' + id, data, this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
+  }
+
+  deleteTask(id: string): Observable<DeleteTaskResponse> {
+    return this.http
+      .delete<DeleteTaskResponse>(this.baseUrl + '/tasks/' + id, this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
+  }
+
+  createUser(userData: CreateUserRequest): Observable<User> {
+    return this.http.post<User>(this.baseUrl + '/users-prisma', userData).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  saveProgress(progressData: SaveProgressRequest): Observable<User> {
+    return this.http.post<User>(this.baseUrl + '/users-prisma/save', progressData).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  getUsersPaginated(page = 1, limit = 10): Observable<UsersPaginatedResponse> {
+    const url = this.baseUrl + '/users-prisma?page=' + page + '&limit=' + limit;
+    return this.http.get<UsersPaginatedResponse>(url).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  getUserById(id: string): Observable<User> {
+    return this.http.get<User>(this.baseUrl + '/users-prisma/' + id).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
   }
 }
