@@ -1,6 +1,7 @@
 import { Component, signal, effect, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
+import { ActivityService } from '../../core/services/activity.service';
 import { ButtonComponent } from '../../shared/components/button.component';
 
 interface Task {
@@ -24,6 +25,7 @@ const POMODORO_DURATION = 25 * 60; // 25 minutes in seconds
 export class FocusComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);
   private router = inject(Router);
+  private activityService = inject(ActivityService);
   private timerInterval: number | null = null;
 
   // Load tasks from storage (normalize id to string)
@@ -117,6 +119,9 @@ export class FocusComponent implements OnInit, OnDestroy {
   completeCurrentTask() {
     const task = this.currentTask;
     if (!task) return;
+
+    // Log activity before updating
+    this.activityService.logTaskCompleted(task.title);
 
     this.tasks.update(tasks =>
       tasks.map(t =>

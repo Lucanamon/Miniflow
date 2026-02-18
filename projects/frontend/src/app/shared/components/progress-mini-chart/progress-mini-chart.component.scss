@@ -2,53 +2,78 @@
   display: block;
 }
 
-.progress-mini-chart {
+.timezone-reader {
   padding: var(--dashboard-card-padding, var(--spacing-md));
 }
 
 .chart-title {
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0 0 var(--spacing-md) 0;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.chart-subtitle {
-  margin: 0 0 var(--spacing-md) 0;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.timezone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-md);
 }
 
-.chart-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--spacing-sm);
-  height: 80px;
-}
-
-.bar-group {
-  flex: 1;
+.timezone-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(125, 211, 252, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(125, 211, 252, 0.2);
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.1);
+  }
 }
 
-.bar {
-  width: 100%;
-  min-height: 4px;
-  background: linear-gradient(
-    180deg,
-    var(--cyan-soft) 0%,
-    var(--cyan-medium) 100%
-  );
-  border-radius: 4px 4px 0 0;
-  box-shadow: 0 0 12px var(--glow-cyan);
-  transition: height 0.3s ease;
+.timezone-city {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cyan-soft);
+  margin-bottom: var(--spacing-xs);
+  text-align: center;
 }
 
-.bar-label {
+.timezone-time {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.timezone-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.timezone-offset {
   font-size: 0.7rem;
   color: var(--text-muted);
-  font-weight: 500;
+  opacity: 0.7;
+  font-family: monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timezone-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .timezone-time {
+    font-size: 1.25rem;
+  }
 }

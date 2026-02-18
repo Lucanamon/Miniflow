@@ -1,15 +1,12 @@
-<div class="progress-mini-chart">
-  <h3 class="chart-title">Weekly Progress</h3>
-  <p class="chart-subtitle">Tasks completed per day (last 7 days)</p>
-  <div class="chart-bars">
-    @for (day of progressData(); track day.date) {
-      <div class="bar-group">
-        <div
-          class="bar"
-          [style.height.%]="(day.completed / maxCompleted()) * 100"
-          [attr.aria-label]="day.label + ': ' + day.completed + ' tasks'"
-        ></div>
-        <span class="bar-label">{{ day.label }}</span>
+<div class="timezone-reader">
+  <h3 class="chart-title">Worldwide clock and timezone</h3>
+  <div class="timezone-grid">
+    @for (tz of timezones(); track tz.city) {
+      <div class="timezone-item">
+        <div class="timezone-city">{{ tz.city }}</div>
+        <div class="timezone-time">{{ tz.time }}</div>
+        <div class="timezone-date">{{ tz.date }}</div>
+        <div class="timezone-offset">{{ tz.offset }}</div>
       </div>
     }
   </div>

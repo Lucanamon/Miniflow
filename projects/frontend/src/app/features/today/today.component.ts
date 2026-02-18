@@ -3,6 +3,7 @@ import { EncouragementService } from '../../core/services/encouragement.service'
 import { StorageService } from '../../core/services/storage.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService, ApiTask } from '../../core/services/api.service';
+import { ActivityService } from '../../core/services/activity.service';
 
 export interface Task {
   id: string;
@@ -32,6 +33,7 @@ export class TodayComponent implements OnInit {
   private auth = inject(AuthService);
   private api = inject(ApiService);
   private encouragementService = inject(EncouragementService);
+  private activityService = inject(ActivityService);
 
   tasks = signal<Task[]>([]);
   loading = signal(true);
@@ -100,6 +102,8 @@ export class TodayComponent implements OnInit {
     );
 
     if (!wasCompleted) {
+      // Task was just completed - log activity
+      this.activityService.logTaskCompleted(task?.title || 'Task');
       this.justCompletedTaskId.set(id);
       setTimeout(() => this.justCompletedTaskId.set(null), 2000);
     }
@@ -120,15 +124,20 @@ export class TodayComponent implements OnInit {
   }
 
   deleteTask(id: string): void {
+    const task = this.tasks().find(t => t.id === id);
+    const taskTitle = task?.title || 'Task';
+
     if (this.auth.isLoggedIn()) {
       this.api.deleteTask(id).subscribe({
         next: () => {
           this.tasks.update(tasks => tasks.filter(t => t.id !== id));
+          this.activityService.logTaskDeleted(taskTitle);
         },
         error: () => this.loadTasks()
       });
     } else {
       this.tasks.update(tasks => tasks.filter(t => t.id !== id));
+      this.activityService.logTaskDeleted(taskTitle);
     }
   }
 }

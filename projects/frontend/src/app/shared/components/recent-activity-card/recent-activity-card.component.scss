@@ -49,3 +49,12 @@
 .activity-title {
   color: var(--text-primary);
 }
+
+.activity-item.empty-state {
+  opacity: 0.6;
+  font-style: italic;
+  
+  .activity-title {
+    color: var(--text-muted);
+  }
+}

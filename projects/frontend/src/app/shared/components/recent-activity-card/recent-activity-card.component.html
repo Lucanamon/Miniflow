@@ -1,12 +1,21 @@
 <div class="recent-activity-card">
   <h3 class="card-title">Recent Activity</h3>
   <ul class="activity-list">
-    @for (event of activity(); track event.id) {
-      <li class="activity-item">
-        <span class="activity-icon">{{ getEventIcon(event.type) }}</span>
+    @if (activity().length > 0) {
+      @for (event of activity().slice(0, 5); track event.id) {
+        <li class="activity-item">
+          <span class="activity-icon">{{ getEventIcon(event.type) }}</span>
+          <div class="activity-content">
+            <span class="activity-type">{{ getEventLabel(event.type) }}:</span>
+            <span class="activity-title">{{ event.title }}</span>
+          </div>
+        </li>
+      }
+    } @else {
+      <li class="activity-item empty-state">
+        <span class="activity-icon">✨</span>
         <div class="activity-content">
-          <span class="activity-type">{{ getEventLabel(event.type) }}:</span>
-          <span class="activity-title">{{ event.title }}</span>
+          <span class="activity-title">No recent activity</span>
         </div>
       </li>
     }

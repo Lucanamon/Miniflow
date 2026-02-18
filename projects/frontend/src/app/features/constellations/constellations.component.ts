@@ -4,6 +4,7 @@ import { CardComponent } from '../../shared/components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { EncouragementService } from '../../core/services/encouragement.service';
 import { StorageService } from '../../core/services/storage.service';
+import { ActivityService } from '../../core/services/activity.service';
 
 interface Board {
   id: number;
@@ -25,6 +26,7 @@ const STORAGE_KEY_BOARDS = 'miniflow_boards';
 export class ConstellationsComponent {
   private storage = inject(StorageService);
   private encouragementService = inject(EncouragementService);
+  private activityService = inject(ActivityService);
 
   // Load boards from storage on init, fallback to defaults
   boards = signal<Board[]>(
@@ -99,6 +101,8 @@ export class ConstellationsComponent {
           : b
       )
     );
+    // Log board update activity
+    this.activityService.logBoardUpdated(name);
     this.closeEditModal();
   }
 }

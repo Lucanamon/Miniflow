@@ -9,6 +9,7 @@ import { EncouragementBannerComponent } from '../../shared/components/encouragem
 import { ProgressMiniChartComponent } from '../../shared/components/progress-mini-chart/progress-mini-chart.component';
 import { RecentActivityCardComponent } from '../../shared/components/recent-activity-card/recent-activity-card.component';
 import { StorageService } from '../../core/services/storage.service';
+import { ActivityService } from '../../core/services/activity.service';
 import { FormsModule } from '@angular/forms';
 
 const STORAGE_KEY_TASKS = 'miniflow_tasks';
@@ -50,6 +51,7 @@ export class SkyComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);
   private auth = inject(AuthService);
   private api = inject(ApiService);
+  private activityService = inject(ActivityService);
   private refreshInterval?: number;
 
   quickTaskTitle = signal('');
@@ -170,15 +172,18 @@ export class SkyComponent implements OnInit, OnDestroy {
       this.api.createTask({ title, board: 'Today', dueTime, completed: false }).subscribe({
         next: (created) => {
           this.storage.set(STORAGE_KEY_TASKS, [...existing, { ...newTask, id: created.id }]);
+          this.activityService.logTaskCreated(title);
           this.updateStats();
         },
         error: () => {
           this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+          this.activityService.logTaskCreated(title);
           this.updateStats();
         }
       });
     } else {
       this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+      this.activityService.logTaskCreated(title);
       this.updateStats();
     }
     this.closeDateTimePicker();

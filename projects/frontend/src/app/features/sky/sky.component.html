@@ -9,42 +9,27 @@
     <app-encouragement-banner context="dashboard" />
   </section>
 
-  <!-- Status Cards Grid -->
-  <div class="status-grid">
-    <!-- Daily Sky Status Card -->
-    <app-card title="Daily Sky Status" variant="default" [hoverable]="true">
-      <div class="card-stat">
-        <div class="stat-value">{{ tasksCompletedToday() }}</div>
-        <div class="stat-label">Tasks completed today</div>
-      </div>
-    </app-card>
-
-    <!-- Current Orbit Stats Card -->
-    <app-card title="Current Orbit" variant="default" [hoverable]="true">
-      <div class="card-stat">
-        <div class="stat-value">{{ tasksInProgress() }}</div>
-        <div class="stat-label">Tasks in progress</div>
-      </div>
-    </app-card>
-
-    <!-- Boards Card -->
-    <app-card title="My Note" variant="default" [hoverable]="true">
-      <div class="card-stat">
-        <div class="stat-value">{{ totalBoards() }}</div>
-        <div class="stat-label">Active boards</div>
-      </div>
-    </app-card>
-  </div>
-
-  <!-- Dashboard Cards Row: Progress Chart, Recent Activity -->
-  <div class="dashboard-cards-row">
-    <app-card variant="default" [hoverable]="true">
-      <app-progress-mini-chart />
-    </app-card>
-    <app-card variant="default" [hoverable]="true">
-      <app-recent-activity-card />
-    </app-card>
-  </div>
+  <!-- Date/Time Picker for Add Task -->
+  @if (showDateTimePicker()) {
+    <section class="date-time-picker-section">
+      <app-card title="Set date &amp; time" variant="default">
+        <div class="task-picker-fields">
+          <label class="task-picker-label">
+            <span>Date</span>
+            <input type="date" [ngModel]="taskDraftDate()" (ngModelChange)="taskDraftDate.set($event)" class="task-picker-input" />
+          </label>
+          <label class="task-picker-label">
+            <span>Time</span>
+            <input type="time" [ngModel]="taskDraftTime()" (ngModelChange)="taskDraftTime.set($event)" class="task-picker-input" />
+          </label>
+        </div>
+        <div class="task-picker-actions">
+          <app-button variant="outline" size="md" (click)="closeDateTimePicker()">Cancel</app-button>
+          <app-button variant="primary" size="md" (click)="confirmAddTask()">Add task</app-button>
+        </div>
+      </app-card>
+    </section>
+  }
 
   <!-- Quick Actions -->
   <section class="quick-actions-section">
@@ -87,30 +72,45 @@
     </app-card>
   </section>
 
+  <!-- Status Cards Grid -->
+  <div class="status-grid">
+    <!-- Daily Sky Status Card -->
+    <app-card title="Daily Sky Status" variant="default" [hoverable]="true">
+      <div class="card-stat">
+        <div class="stat-value">{{ tasksCompletedToday() }}</div>
+        <div class="stat-label">Tasks completed today</div>
+      </div>
+    </app-card>
+
+    <!-- Current Orbit Stats Card -->
+    <app-card title="Current Orbit" variant="default" [hoverable]="true">
+      <div class="card-stat">
+        <div class="stat-value">{{ tasksInProgress() }}</div>
+        <div class="stat-label">Tasks in progress</div>
+      </div>
+    </app-card>
+
+    <!-- Boards Card -->
+    <app-card title="My Note" variant="default" [hoverable]="true">
+      <div class="card-stat">
+        <div class="stat-value">{{ totalBoards() }}</div>
+        <div class="stat-label">Active boards</div>
+      </div>
+    </app-card>
+  </div>
+
+  <!-- Dashboard Cards Row: Progress Chart, Recent Activity -->
+  <div class="dashboard-cards-row">
+    <app-card variant="default" [hoverable]="true">
+      <app-progress-mini-chart />
+    </app-card>
+    <app-card variant="default" [hoverable]="true">
+      <app-recent-activity-card />
+    </app-card>
+  </div>
+
   <!-- Future Insight Module -->
   <section class="future-module-placeholder" aria-hidden="true">
     <!-- Future Insight Module -->
   </section>
-
-  <!-- Floating Date/Time Picker for Add Task -->
-  @if (showDateTimePicker()) {
-    <div class="task-picker-backdrop" (click)="closeDateTimePicker()" role="button" tabindex="0" aria-label="Close"></div>
-    <div class="task-picker-floating" role="dialog" aria-labelledby="task-picker-title" (click)="$event.stopPropagation()">
-      <h3 id="task-picker-title" class="task-picker-title">Set date &amp; time</h3>
-      <div class="task-picker-fields">
-        <label class="task-picker-label">
-          <span>Date</span>
-          <input type="date" [ngModel]="taskDraftDate()" (ngModelChange)="taskDraftDate.set($event)" class="task-picker-input" />
-        </label>
-        <label class="task-picker-label">
-          <span>Time</span>
-          <input type="time" [ngModel]="taskDraftTime()" (ngModelChange)="taskDraftTime.set($event)" class="task-picker-input" />
-        </label>
-      </div>
-      <div class="task-picker-actions">
-        <app-button variant="outline" size="md" (click)="closeDateTimePicker()">Cancel</app-button>
-        <app-button variant="primary" size="md" (click)="confirmAddTask()">Add task</app-button>
-      </div>
-    </div>
-  }
 </div>
