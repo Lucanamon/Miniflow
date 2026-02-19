@@ -1,0 +1,6 @@
+@Miniflow.Backend_HostAddress = http://localhost:5131
+
+GET {{Miniflow.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

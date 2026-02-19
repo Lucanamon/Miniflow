@@ -36,37 +36,37 @@
           "skipTests": true
         }
       },
-      "root": "projects/frontend",
-      "sourceRoot": "projects/frontend/src",
+      "root": "frontend",
+      "sourceRoot": "frontend/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "browser": "projects/frontend/src/main.ts",
-            "tsConfig": "projects/frontend/tsconfig.app.json",
+            "browser": "frontend/src/main.ts",
+            "tsConfig": "frontend/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
-                "input": "projects/frontend/public"
+                "input": "frontend/public"
               }
             ],
             "styles": [
-              "projects/frontend/src/styles.scss"
+              "frontend/src/styles.scss"
             ],
-            "server": "projects/frontend/src/main.server.ts",
+            "server": "frontend/src/main.server.ts",
             "outputMode": "server",
             "ssr": {
-              "entry": "projects/frontend/src/server.ts"
+              "entry": "frontend/src/server.ts"
             }
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "projects/frontend/src/environments/environment.ts",
-                  "with": "projects/frontend/src/environments/environment.prod.ts"
+                  "replace": "frontend/src/environments/environment.ts",
+                  "with": "frontend/src/environments/environment.prod.ts"
                 }
               ],
               "budgets": [

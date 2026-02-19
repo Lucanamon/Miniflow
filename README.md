@@ -1,14 +1,13 @@
 # Miniflow Monorepo
 
-A monorepo workspace containing the Miniflow application with frontend and backend components.
+A monorepo workspace containing the Miniflow application with Angular frontend and ASP.NET backend.
 
 ## Workspace Structure
 
 ```
 Miniflow/
-├── projects/
-│   └── frontend/          # Angular frontend application
-├── Miniflow_Backend/      # .NET backend API
+├── frontend/              # Angular frontend application
+├── backend/               # ASP.NET Core Web API backend
 ├── package.json           # Root package.json for frontend dependencies
 ├── angular.json           # Angular workspace configuration
 └── tsconfig.json          # TypeScript configuration
@@ -18,7 +17,7 @@ Miniflow/
 
 - Node.js (v20.19.0+ or v22.12.0+ or v24.0.0+)
 - npm 11.6.2+
-- .NET SDK (for backend)
+- .NET 8.0 SDK (for backend)
 
 ## Frontend Development
 
@@ -68,9 +67,28 @@ npm run serve:ssr:frontend
 
 ## Backend Development
 
-The backend is a .NET application located in `Miniflow_Backend/`.
+The backend is an ASP.NET Core Web API application located in `backend/`.
 
-See the backend directory for specific backend documentation.
+### Available Scripts
+
+- `npm run start:backend` - Start the backend server
+- `npm run watch:backend` - Start with hot reload (watch mode)
+- `npm run build:backend` - Build the backend
+- `npm run test:backend` - Run backend tests
+
+### Development Server
+
+To start the backend:
+
+```bash
+npm run start:backend
+# or
+npm run watch:backend  # for hot reload
+```
+
+The API will be available at `http://localhost:5000` and Swagger UI at `http://localhost:5000/swagger`.
+
+See the `backend/README.md` for more detailed backend documentation.
 
 ## Code Scaffolding
 
@@ -104,3 +122,4 @@ ng generate application project-name --routing --style=scss --ssr
 
 - [Angular CLI Documentation](https://angular.dev/tools/cli)
 - [Angular SSR Guide](https://angular.dev/guide/ssr)
+- [ASP.NET Core Documentation](https://learn.microsoft.com/en-us/aspnet/core/)
