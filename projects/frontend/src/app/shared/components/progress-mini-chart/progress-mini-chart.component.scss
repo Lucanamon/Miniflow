@@ -15,19 +15,20 @@
 
 .timezone-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-sm);
 }
 
 .timezone-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(125, 211, 252, 0.1);
   border-radius: 8px;
   transition: all 0.2s ease;
+  min-width: 0;
 
   &:hover {
     background: rgba(255, 255, 255, 0.05);
@@ -37,43 +38,42 @@
 }
 
 .timezone-city {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--cyan-soft);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 2px;
   text-align: center;
 }
 
 .timezone-time {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 2px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
 
 .timezone-date {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 2px;
 }
 
 .timezone-offset {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   opacity: 0.7;
   font-family: monospace;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive: stack on narrow screens */
+@media (max-width: 640px) {
   .timezone-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
   }
 
   .timezone-time {
-    font-size: 1.25rem;
+    font-size: 0.9rem;
   }
 }
