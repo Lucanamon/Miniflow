@@ -37,17 +37,6 @@ export interface User {
   updatedAt?: Date;
 }
 
-export interface CreateUserRequest {
-  email: string;
-  password: string;
-  name?: string;
-}
-
-export interface SaveProgressRequest {
-  email: string;
-  name?: string;
-}
-
 export interface ApiError {
   message: string;
   status?: number;
@@ -80,13 +69,6 @@ export interface UpdateTaskRequest {
 
 export interface DeleteTaskResponse {
   message: string;
-}
-
-export interface UsersPaginatedResponse {
-  data: User[];
-  total: number;
-  page: number;
-  limit: number;
 }
 
 type AuthHeaders = { headers?: Record<string, string> };
@@ -190,38 +172,5 @@ export class ApiService {
           this.handleError(e);
         })
       );
-  }
-
-  createUser(userData: CreateUserRequest): Observable<User> {
-    return this.http.post<User>(this.baseUrl + '/users-prisma', userData).pipe(
-      catchError((e) => {
-        this.handleError(e);
-      })
-    );
-  }
-
-  saveProgress(progressData: SaveProgressRequest): Observable<User> {
-    return this.http.post<User>(this.baseUrl + '/users-prisma/save', progressData).pipe(
-      catchError((e) => {
-        this.handleError(e);
-      })
-    );
-  }
-
-  getUsersPaginated(page = 1, limit = 10): Observable<UsersPaginatedResponse> {
-    const url = this.baseUrl + '/users-prisma?page=' + page + '&limit=' + limit;
-    return this.http.get<UsersPaginatedResponse>(url).pipe(
-      catchError((e) => {
-        this.handleError(e);
-      })
-    );
-  }
-
-  getUserById(id: string): Observable<User> {
-    return this.http.get<User>(this.baseUrl + '/users-prisma/' + id).pipe(
-      catchError((e) => {
-        this.handleError(e);
-      })
-    );
   }
 }
