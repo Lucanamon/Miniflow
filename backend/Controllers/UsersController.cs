@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Miniflow.Backend.Data;
@@ -7,6 +8,7 @@ namespace Miniflow.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[AllowAnonymous]
 public class UsersController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

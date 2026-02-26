@@ -1,7 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Miniflow.Backend.Data;
 using Miniflow.Backend.Models;
 
@@ -9,13 +14,16 @@ namespace Miniflow.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
+    private readonly IConfiguration _config;
 
-    public AuthController(ApplicationDbContext db)
+    public AuthController(ApplicationDbContext db, IConfiguration config)
     {
         _db = db;
+        _config = config;
     }
 
     [HttpPost("register")]
@@ -72,14 +80,33 @@ public class AuthController : ControllerBase
         return HashPassword(password) == hash;
     }
 
-    private static AuthResponse BuildAuthResponse(User user)
+    private AuthResponse BuildAuthResponse(User user)
     {
-        // For now, return a dummy token. Later you can replace this with a real JWT.
-        var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+        var key = _config["Jwt:Key"] ?? throw new InvalidOperationException("JWT key not configured");
+        var issuer = _config["Jwt:Issuer"];
+        var audience = _config["Jwt:Audience"];
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Email, user.Email)
+        };
+
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: creds);
+
+        var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
         return new AuthResponse
         {
-            Access_Token = token,
+            AccessToken = tokenValue,
             ExpiresIn = 3600,
             User = new AuthUser
             {

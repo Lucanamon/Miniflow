@@ -9,7 +9,7 @@ API surface designed to match the Angular frontend (`ApiService`). Base path: `/
 | Health  | GET /health | No |
 | Auth    | POST /auth/register, POST /auth/login | No |
 | Users   | GET /users | No |
-| Tasks   | GET /tasks, POST /tasks, PATCH /tasks/:id, DELETE /tasks/:id | Bearer (JWT) |
+| Tasks   | GET /tasks, POST /tasks, PATCH /tasks/:id, DELETE /tasks/:id | Bearer (JWT, required) |
 
 ## 1. Health
 
@@ -32,10 +32,10 @@ API surface designed to match the Angular frontend (`ApiService`). Base path: `/
   - Response: `User[]`  
   - User: `{ "id", "email", "name"?, "createdAt"?, "updatedAt"? }`
 
-## 4. Tasks (JWT optional for now)
+## 4. Tasks (JWT required)
 
 - **GET** `/api/tasks`  
-  - Headers: `Authorization: Bearer <token>` (optional for now)  
+- Headers: `Authorization: Bearer <token>` (required)  
   - Response: `ApiTask[]`  
   - ApiTask: `{ "id", "title", "board"?, "dueTime"?, "completed", "userId", "createdAt"? }`
 

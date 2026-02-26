@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Miniflow.Backend.Models;
 
 public class LoginRequest
@@ -22,8 +24,11 @@ public class AuthUser
 
 public class AuthResponse
 {
-    public string Access_Token { get; set; } = string.Empty;
+    [JsonPropertyName("access_token")]
+    public string AccessToken { get; set; } = string.Empty;
+
+    [JsonPropertyName("expiresIn")]
     public int? ExpiresIn { get; set; }
+
     public AuthUser? User { get; set; }
 }
-

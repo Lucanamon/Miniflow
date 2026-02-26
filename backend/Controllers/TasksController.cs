@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Miniflow.Backend.Data;
@@ -7,6 +9,7 @@ namespace Miniflow.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TasksController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -16,23 +19,38 @@ public class TasksController : ControllerBase
         _db = db;
     }
 
+    private string? GetCurrentUserId()
+    {
+        return User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
     {
-        var tasks = await _db.Tasks.AsNoTracking().ToListAsync();
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var tasks = await _db.Tasks
+            .AsNoTracking()
+            .Where(t => t.UserId == userId)
+            .ToListAsync();
+
         return Ok(tasks);
     }
 
     [HttpPost]
     public async Task<ActionResult<TaskItem>> Create([FromBody] TaskItem input)
     {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
         var task = new TaskItem
         {
             Title = input.Title,
             Board = input.Board,
             DueTime = input.DueTime,
             Completed = input.Completed,
-            UserId = string.IsNullOrWhiteSpace(input.UserId) ? "demo-user" : input.UserId
+            UserId = userId
         };
 
         _db.Tasks.Add(task);
@@ -44,7 +62,10 @@ public class TasksController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<ActionResult<TaskItem>> Update(string id, [FromBody] TaskItem input)
     {
-        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         if (task is null) return NotFound(new { message = "Task not found" });
 
         if (!string.IsNullOrWhiteSpace(input.Title))
@@ -63,7 +84,10 @@ public class TasksController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         if (task is null) return NotFound(new { message = "Task not found" });
 
         _db.Tasks.Remove(task);
