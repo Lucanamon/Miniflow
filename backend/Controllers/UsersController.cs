@@ -8,7 +8,7 @@ namespace Miniflow.Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[AllowAnonymous]
+[Authorize(Roles = $"{UserRole.Admin},{UserRole.RootAdmin}")]
 public class UsersController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -19,15 +19,16 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetAll()
+    public async Task<ActionResult<IEnumerable<UserListDto>>> GetAll()
     {
         var users = await _db.Users
             .AsNoTracking()
-            .Select(u => new User
+            .Select(u => new UserListDto
             {
                 Id = u.Id,
                 Email = u.Email,
                 Name = u.Name,
+                Role = u.Role,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt
             })

@@ -20,6 +20,7 @@ public class AuthUser
     public string Id { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? Name { get; set; }
+    public string Role { get; set; } = UserRole.User;
 }
 
 public class AuthResponse
@@ -31,4 +32,22 @@ public class AuthResponse
     public int? ExpiresIn { get; set; }
 
     public AuthUser? User { get; set; }
+}
+
+/// <summary>Request to promote or demote a user (Admin or User). RootAdmin cannot be changed.</summary>
+public class UpdateUserRoleRequest
+{
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = string.Empty; // UserRole.User or UserRole.Admin
+}
+
+/// <summary>User list item for admin dashboard (no password).</summary>
+public class UserListDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string Role { get; set; } = UserRole.User;
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

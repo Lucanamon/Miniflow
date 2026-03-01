@@ -8,6 +8,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name?: string;
+  role?: string;
 }
 
 @Injectable({
@@ -39,6 +40,11 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  isAdmin(): boolean {
+    const role = this.getUser()?.role;
+    return role === 'Admin' || role === 'RootAdmin';
   }
 
   logout(): void {

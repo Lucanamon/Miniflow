@@ -1,0 +1,78 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Manage users and create admin accounts</p>
+  </div>
+
+  <app-card title="Create admin" subtitle="Add a new admin user">
+    <form (ngSubmit)="createAdmin()" class="admin-form">
+      <input type="email" [(ngModel)]="newEmail" name="newEmail" placeholder="Email" required />
+      <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Password (min 6)" required minlength="6" />
+      <input type="text" [(ngModel)]="newName" name="newName" placeholder="Name (optional)" />
+      @if (createError()) {
+        <p class="form-error">{{ createError() }}</p>
+      }
+      <app-button type="submit" variant="primary" size="md" [disabled]="creating()">
+        {{ creating() ? 'Creating...' : 'Create admin' }}
+      </app-button>
+    </form>
+  </app-card>
+
+  <app-card title="Users" [subtitle]="users().length + ' users'">
+    @if (loading()) {
+      <p class="muted">Loading users...</p>
+    } @else if (users().length === 0) {
+      <p class="muted">No users yet.</p>
+    } @else {
+      <div class="table-wrap">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users(); track u.id) {
+              <tr>
+                <td>{{ u.email }}</td>
+                <td>{{ u.name || '—' }}</td>
+                <td>
+                  @if (u.role === 'RootAdmin' || u.id === currentUserId()) {
+                    <span class="role-badge" [class.role-admin]="u.role === 'Admin'" [class.role-root]="u.role === 'RootAdmin'">
+                      {{ u.role === 'RootAdmin' ? 'Root' : (u.role || 'User') }}
+                    </span>
+                  } @else {
+                    <select
+                      class="role-select"
+                      [ngModel]="u.role || 'User'"
+                      (ngModelChange)="changeRole(u, $event)"
+                      [disabled]="updatingRoleId() === u.id"
+                      [name]="'role-' + u.id"
+                    >
+                      <option value="User">User</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                  }
+                </td>
+                <td>{{ formatDate(u.createdAt) }}</td>
+                <td>
+                  @if (u.role !== 'RootAdmin' && u.id !== currentUserId()) {
+                    <button type="button" class="btn-delete" (click)="confirmDelete(u)" [disabled]="deletingId() === u.id" title="Remove user (root admin cannot be removed)">
+                      {{ deletingId() === u.id ? '…' : 'Remove' }}
+                    </button>
+                  } @else {
+                    <span class="muted small">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-card>
+</div>

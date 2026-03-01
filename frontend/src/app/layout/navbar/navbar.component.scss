@@ -1,3 +1,59 @@
 @use '../../app.scss';
 
 /* Navbar styles are inherited from app.scss */
+
+.header-sep {
+  color: var(--text-secondary);
+  margin: 0 var(--spacing-xs);
+  user-select: none;
+  font-weight: 500;
+}
+
+.header-login-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 8px;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(125, 211, 252, 0.1);
+  }
+
+  &.active {
+    background: rgba(125, 211, 252, 0.15);
+  }
+}
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  background: transparent;
+}
+
+.user-email {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: rgba(125, 211, 252, 0.1);
+    border-color: rgba(125, 211, 252, 0.5);
+  }
+}

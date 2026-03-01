@@ -1,9 +1,11 @@
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Miniflow.Backend.Data;
+using Miniflow.Backend.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,11 +84,40 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply pending migrations / ensure database is up to date
+// Apply pending migrations and seed built-in admin if none exists
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     db.Database.Migrate();
+
+    var hasRootAdmin = db.Users.Any(u => u.Role == UserRole.RootAdmin);
+    if (!hasRootAdmin)
+    {
+        var hasAdmin = db.Users.Any(u => u.Role == UserRole.Admin);
+        if (hasAdmin)
+        {
+            var firstAdmin = db.Users.OrderBy(u => u.CreatedAt).First(u => u.Role == UserRole.Admin);
+            firstAdmin.Role = UserRole.RootAdmin;
+            db.SaveChanges();
+        }
+        else
+        {
+            var adminEmail = config["Admin:Email"] ?? "admin@miniflow.local";
+            var adminPassword = config["Admin:Password"] ?? "ChangeMe123!";
+            using var sha = SHA256.Create();
+            var hashBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(adminPassword));
+            var passwordHash = Convert.ToBase64String(hashBytes);
+            db.Users.Add(new User
+            {
+                Email = adminEmail,
+                Name = "Built-in Admin",
+                Role = UserRole.RootAdmin,
+                PasswordHash = passwordHash
+            });
+            db.SaveChanges();
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.

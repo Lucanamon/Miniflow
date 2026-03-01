@@ -26,13 +26,14 @@ export interface RegisterRequest {
 export interface AuthResponse {
   access_token: string;
   expiresIn?: number;
-  user?: { id: string; email: string; name?: string };
+  user?: { id: string; email: string; name?: string; role?: string };
 }
 
 export interface User {
   id: string;
   email: string;
   name?: string;
+  role?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -115,11 +116,37 @@ export class ApiService {
   }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + '/users').pipe(
+    return this.http.get<User[]>(this.baseUrl + '/users', this.authOptions()).pipe(
       catchError((e) => {
         this.handleError(e);
       })
     );
+  }
+
+  createAdmin(data: RegisterRequest): Observable<User> {
+    return this.http.post<User>(this.baseUrl + '/admin/users', data, this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(this.baseUrl + '/admin/users/' + encodeURIComponent(id), this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  updateUserRole(id: string, role: string): Observable<User> {
+    return this.http
+      .patch<User>(this.baseUrl + '/admin/users/' + encodeURIComponent(id) + '/role', { role }, this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
