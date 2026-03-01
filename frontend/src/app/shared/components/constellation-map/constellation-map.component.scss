@@ -18,6 +18,36 @@ $line-color: rgba(244, 208, 63, 0.5);
   overflow: visible;
 }
 
+/* ----- Bigger, lighter outer circle behind galaxy disc ----- */
+.galaxy-outer-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 560px;
+  height: 560px;
+  margin-left: -280px;
+  margin-top: -280px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+
+  /* Lighter radial gradient: soft purple/violet halo */
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 0%,
+    rgba(45, 35, 75, 0.25) 35%,
+    rgba(65, 50, 100, 0.4) 55%,
+    rgba(80, 60, 120, 0.35) 72%,
+    rgba(95, 75, 140, 0.2) 85%,
+    rgba(110, 85, 155, 0.08) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(167, 139, 250, 0.12),
+    0 0 80px rgba(120, 90, 180, 0.15),
+    0 0 160px rgba(90, 70, 150, 0.08);
+}
+
 /* ----- Dark galaxy disc behind constellation ----- */
 .galaxy-disc {
   position: absolute;
