@@ -1,6 +1,7 @@
 import { Component, signal, effect, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '../../core/services/storage.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ActivityService } from '../../core/services/activity.service';
 import { ButtonComponent } from '../../shared/components/button.component';
 
@@ -12,7 +13,7 @@ interface Task {
   completed: boolean;
 }
 
-const STORAGE_KEY_TASKS = 'miniflow_tasks';
+const STORAGE_KEY_TASKS_PREFIX = 'miniflow_tasks';
 const POMODORO_DURATION = 25 * 60; // 25 minutes in seconds
 
 @Component({
@@ -25,24 +26,31 @@ const POMODORO_DURATION = 25 * 60; // 25 minutes in seconds
 export class FocusComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);
   private router = inject(Router);
+  private auth = inject(AuthService);
   private activityService = inject(ActivityService);
   private timerInterval: number | null = null;
 
-  // Load tasks from storage (normalize id to string)
-  tasks = signal<Task[]>(
-    (this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(STORAGE_KEY_TASKS) ?? []).map(t => ({ ...t, id: String(t.id) }))
-  );
+  tasks = signal<Task[]>([]);
 
-  // Timer state
   timerSeconds = signal(POMODORO_DURATION);
   isTimerRunning = signal(false);
   currentTaskIndex = signal(0);
 
   constructor() {
-    // Auto-save tasks whenever they change
+    this.tasks.set(this.loadTasksFromStorage());
     effect(() => {
-      this.storage.set(STORAGE_KEY_TASKS, this.tasks());
+      this.storage.set(this.getTasksKey(), this.tasks());
     });
+  }
+
+  private getTasksKey(): string {
+    const userId = this.auth.getUser()?.id ?? 'anonymous';
+    return `${STORAGE_KEY_TASKS_PREFIX}_${userId}`;
+  }
+
+  private loadTasksFromStorage(): Task[] {
+    const raw = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(this.getTasksKey()) ?? [];
+    return raw.map(t => ({ ...t, id: String(t.id) })) as Task[];
   }
 
   ngOnInit() {

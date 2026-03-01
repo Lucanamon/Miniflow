@@ -13,7 +13,7 @@ export interface Task {
   completed: boolean;
 }
 
-const STORAGE_KEY_TASKS = 'miniflow_tasks';
+const STORAGE_KEY_TASKS_PREFIX = 'miniflow_tasks';
 const DEFAULT_TASKS: Task[] = [
   { id: '1', title: 'Review project proposal', board: 'Work Projects', dueTime: '10:00 AM', completed: false },
   { id: '2', title: 'Team standup meeting', board: 'Work Projects', dueTime: '11:00 AM', completed: false },
@@ -39,17 +39,23 @@ export class TodayComponent implements OnInit {
   loading = signal(true);
   emptyStateMessage = signal('');
   justCompletedTaskId = signal<string | null>(null);
+  newTaskTitle = signal('');
 
   constructor() {
-    // Sync tasks to localStorage (for Sky/Focus) - when logged in we also keep storage in sync
+    // Sync tasks to current user's storage (for Sky/Focus)
     effect(() => {
       const t = this.tasks();
       if (t.length > 0) {
-        this.storage.set(STORAGE_KEY_TASKS, t);
+        this.storage.set(this.getTasksKey(), t);
       }
     });
 
     this.emptyStateMessage.set(this.encouragementService.getRandomEmptyStateMessage());
+  }
+
+  private getTasksKey(): string {
+    const userId = this.auth.getUser()?.id ?? 'anonymous';
+    return `${STORAGE_KEY_TASKS_PREFIX}_${userId}`;
   }
 
   ngOnInit(): void {
@@ -59,21 +65,37 @@ export class TodayComponent implements OnInit {
   private loadTasks(): void {
     this.loading.set(true);
     if (this.auth.isLoggedIn()) {
+      // Load from storage first so Quick Actions tasks (saved to storage) are visible immediately
+      const key = this.getTasksKey();
+      const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(key);
+      const fromStorage = stored && stored.length > 0 ? stored.map(t => ({ ...t, id: String(t.id) })) as Task[] : [];
+
       this.api.getTasks().subscribe({
         next: (apiTasks) => {
-          this.tasks.set(this.apiTasksToTasks(apiTasks));
+          const fromApi = this.apiTasksToTasks(apiTasks);
+          this.tasks.set(this.mergeTasks(fromApi, fromStorage));
           this.loading.set(false);
         },
         error: () => {
-          this.fallbackToStorage();
+          this.tasks.set(fromStorage.length > 0 ? fromStorage : DEFAULT_TASKS);
           this.loading.set(false);
         }
       });
     } else {
-      const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(STORAGE_KEY_TASKS);
+      const key = this.getTasksKey();
+      const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(key);
       this.tasks.set(stored && stored.length > 0 ? stored.map(t => ({ ...t, id: String(t.id) })) : DEFAULT_TASKS);
       this.loading.set(false);
     }
+  }
+
+  /** Merge API tasks with storage tasks so Quick Actions tasks (saved to storage) appear on Today */
+  private mergeTasks(apiTasks: Task[], storageTasks: Task[]): Task[] {
+    const byId = new Map(apiTasks.map(t => [t.id, t]));
+    for (const t of storageTasks) {
+      if (!byId.has(t.id)) byId.set(t.id, t);
+    }
+    return Array.from(byId.values());
   }
 
   private apiTasksToTasks(apiTasks: ApiTask[]): Task[] {
@@ -87,7 +109,8 @@ export class TodayComponent implements OnInit {
   }
 
   private fallbackToStorage(): void {
-    const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(STORAGE_KEY_TASKS);
+    const key = this.getTasksKey();
+    const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(key);
     this.tasks.set(stored && stored.length > 0 ? stored.map(t => ({ ...t, id: String(t.id) })) : DEFAULT_TASKS);
   }
 
@@ -138,6 +161,37 @@ export class TodayComponent implements OnInit {
     } else {
       this.tasks.update(tasks => tasks.filter(t => t.id !== id));
       this.activityService.logTaskDeleted(taskTitle);
+    }
+  }
+
+  addTask(): void {
+    const title = this.newTaskTitle().trim();
+    if (!title) return;
+
+    const newTask: Task = {
+      id: String(Date.now()),
+      title,
+      board: 'Today',
+      completed: false
+    };
+
+    if (this.auth.isLoggedIn()) {
+      this.api.createTask({ title, board: 'Today', completed: false }).subscribe({
+        next: (created) => {
+          this.tasks.update(tasks => [...tasks, { ...newTask, id: created.id }]);
+          this.activityService.logTaskCreated(title);
+          this.newTaskTitle.set('');
+        },
+        error: () => {
+          this.tasks.update(tasks => [...tasks, newTask]);
+          this.activityService.logTaskCreated(title);
+          this.newTaskTitle.set('');
+        }
+      });
+    } else {
+      this.tasks.update(tasks => [...tasks, newTask]);
+      this.activityService.logTaskCreated(title);
+      this.newTaskTitle.set('');
     }
   }
 }

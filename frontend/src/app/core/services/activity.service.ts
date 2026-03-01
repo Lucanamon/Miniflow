@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { StorageService } from './storage.service';
+import { AuthService } from './auth.service';
 
 export type ActivityType = 'completed' | 'created' | 'board_updated' | 'deleted';
 
@@ -10,7 +11,7 @@ export interface ActivityEvent {
   timestamp: Date;
 }
 
-const STORAGE_KEY_ACTIVITIES = 'miniflow_activities';
+const STORAGE_KEY_PREFIX = 'miniflow_activities';
 const MAX_ACTIVITIES = 10; // Keep last 10 activities
 
 @Injectable({
@@ -18,24 +19,35 @@ const MAX_ACTIVITIES = 10; // Keep last 10 activities
 })
 export class ActivityService {
   private storage = inject(StorageService);
-  
-  // Signal for reactive updates
+  private auth = inject(AuthService);
+
+  // Signal for reactive updates (per-user)
   readonly activities = signal<ActivityEvent[]>([]);
 
   constructor() {
-    // Load activities from storage on init
+    this.reloadForCurrentUser();
+  }
+
+  /** Per-user storage key so each user only sees their own activity */
+  private getStorageKey(): string {
+    const userId = this.auth.getUser()?.id ?? 'anonymous';
+    return `${STORAGE_KEY_PREFIX}_${userId}`;
+  }
+
+  /** Reload activities for the current user (call after login/logout) */
+  reloadForCurrentUser(): void {
     this.activities.set(this.loadActivities());
   }
 
   /**
-   * Load activities from storage
+   * Load activities from storage for current user
    */
   private loadActivities(): ActivityEvent[] {
-    const stored = this.storage.get<Array<Omit<ActivityEvent, 'timestamp'> & { timestamp: string }>>(STORAGE_KEY_ACTIVITIES);
+    const key = this.getStorageKey();
+    const stored = this.storage.get<Array<Omit<ActivityEvent, 'timestamp'> & { timestamp: string }>>(key);
     if (!stored || stored.length === 0) {
       return [];
     }
-    // Convert timestamp strings back to Date objects
     return stored
       .map(a => ({
         ...a,
@@ -46,15 +58,14 @@ export class ActivityService {
   }
 
   /**
-   * Save activities to storage
+   * Save activities to storage for current user
    */
   private saveActivities(activities: ActivityEvent[]): void {
-    // Convert Date objects to strings for storage
     const toStore = activities.map(a => ({
       ...a,
       timestamp: a.timestamp.toISOString()
     }));
-    this.storage.set(STORAGE_KEY_ACTIVITIES, toStore);
+    this.storage.set(this.getStorageKey(), toStore);
   }
 
   /**

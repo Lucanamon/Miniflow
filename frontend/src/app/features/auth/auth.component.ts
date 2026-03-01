@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
+import { ActivityService } from '../../core/services/activity.service';
 import { ButtonComponent } from '../../shared/components/button.component';
 
 @Component({
@@ -81,6 +82,7 @@ export class AuthComponent {
   auth = inject(AuthService);
   api = inject(ApiService);
   router = inject(Router);
+  activityService = inject(ActivityService);
 
   loginEmail = '';
   loginPassword = '';
@@ -99,6 +101,7 @@ export class AuthComponent {
       next: (res) => {
         this.auth.saveToken(res.access_token);
         if (res.user) this.auth.saveUser(res.user);
+        this.activityService.reloadForCurrentUser();
         this.loading.set(false);
         this.router.navigateByUrl('/today'); // Sync: navigate to Today to load server tasks
       },
@@ -120,6 +123,7 @@ export class AuthComponent {
       next: (res) => {
         this.auth.saveToken(res.access_token);
         if (res.user) this.auth.saveUser(res.user);
+        this.activityService.reloadForCurrentUser();
         this.regLoading.set(false);
         this.router.navigateByUrl('/today');
       },
@@ -132,5 +136,6 @@ export class AuthComponent {
 
   logout(): void {
     this.auth.logout();
+    this.activityService.reloadForCurrentUser();
   }
 }

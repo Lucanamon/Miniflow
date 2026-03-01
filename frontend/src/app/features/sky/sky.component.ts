@@ -12,8 +12,8 @@ import { StorageService } from '../../core/services/storage.service';
 import { ActivityService } from '../../core/services/activity.service';
 import { FormsModule } from '@angular/forms';
 
-const STORAGE_KEY_TASKS = 'miniflow_tasks';
-const STORAGE_KEY_BOARDS = 'miniflow_boards';
+const STORAGE_KEY_TASKS_PREFIX = 'miniflow_tasks';
+const STORAGE_KEY_BOARDS_PREFIX = 'miniflow_boards';
 
 interface Task {
   id: string;
@@ -54,6 +54,10 @@ export class SkyComponent implements OnInit, OnDestroy {
   private activityService = inject(ActivityService);
   private refreshInterval?: number;
 
+  get isLoggedIn(): boolean {
+    return this.auth.isLoggedIn();
+  }
+
   quickTaskTitle = signal('');
   showDateTimePicker = signal(false);
   taskDraftDate = signal('');
@@ -90,39 +94,46 @@ export class SkyComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle storage events from other tabs/windows
+   * Handle storage events from other tabs/windows (only for current user's keys)
    */
   private handleStorageChange(event: StorageEvent): void {
-    if (event.key === STORAGE_KEY_TASKS || event.key === STORAGE_KEY_BOARDS) {
+    const tasksKey = this.getTasksKey();
+    const boardsKey = this.getBoardsKey();
+    if (event.key === tasksKey || event.key === boardsKey) {
       this.updateStats();
     }
   }
 
+  private getTasksKey(): string {
+    const userId = this.auth.getUser()?.id ?? 'anonymous';
+    return `${STORAGE_KEY_TASKS_PREFIX}_${userId}`;
+  }
+
+  private getBoardsKey(): string {
+    const userId = this.auth.getUser()?.id ?? 'anonymous';
+    return `${STORAGE_KEY_BOARDS_PREFIX}_${userId}`;
+  }
+
   /**
-   * Update all stats from storage in real-time
+   * Update all stats from storage in real-time (per-user)
    */
   private updateStats(): void {
-    // Get tasks from storage (normalize id to string for compatibility)
-    const raw = this.storage.get<Array<{ id: number | string; [k: string]: unknown }>>(STORAGE_KEY_TASKS) ?? [];
+    const tasksKey = this.getTasksKey();
+    const boardsKey = this.getBoardsKey();
+
+    const raw = this.storage.get<Array<{ id: number | string; [k: string]: unknown }>>(tasksKey) ?? [];
     const tasks = raw.map(t => ({ ...t, id: String(t.id) })) as Task[];
-    
-    // Calculate tasks in progress (incomplete tasks)
+
     const incompleteTasks = tasks.filter(t => !t.completed);
     this.tasksInProgress.set(incompleteTasks.length);
-    
-    // Calculate tasks completed today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+
     const tasksCompletedToday = tasks.filter(task => {
       if (!task.completed) return false;
-      // For now, we'll count all completed tasks as "today"
-      // If you have a completedAt timestamp, use that instead
       return true;
     }).length;
     this.tasksCompletedToday.set(tasksCompletedToday);
-    
-    // Get boards from storage
-    const boards = this.storage.get<Board[]>(STORAGE_KEY_BOARDS) ?? [];
+
+    const boards = this.storage.get<Board[]>(boardsKey) ?? [];
     this.totalBoards.set(boards.length);
   }
 
@@ -160,7 +171,8 @@ export class SkyComponent implements OnInit, OnDestroy {
     const timeStr = this.taskDraftTime();
     const dueTime = this.formatDueTime(dateStr, timeStr);
 
-    const existing = this.storage.get<Task[]>(STORAGE_KEY_TASKS) ?? [];
+    const tasksKey = this.getTasksKey();
+    const existing = this.storage.get<Task[]>(tasksKey) ?? [];
     const newTask: Task = {
       id: String(Date.now()),
       title,
@@ -171,18 +183,18 @@ export class SkyComponent implements OnInit, OnDestroy {
     if (this.auth.isLoggedIn()) {
       this.api.createTask({ title, board: 'Today', dueTime, completed: false }).subscribe({
         next: (created) => {
-          this.storage.set(STORAGE_KEY_TASKS, [...existing, { ...newTask, id: created.id }]);
+          this.storage.set(tasksKey, [...existing, { ...newTask, id: created.id }]);
           this.activityService.logTaskCreated(title);
           this.updateStats();
         },
         error: () => {
-          this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+          this.storage.set(tasksKey, [...existing, newTask]);
           this.activityService.logTaskCreated(title);
           this.updateStats();
         }
       });
     } else {
-      this.storage.set(STORAGE_KEY_TASKS, [...existing, newTask]);
+      this.storage.set(tasksKey, [...existing, newTask]);
       this.activityService.logTaskCreated(title);
       this.updateStats();
     }

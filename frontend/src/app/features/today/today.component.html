@@ -7,6 +7,22 @@
     </div>
   </div>
 
+  <!-- Create task box -->
+  <div class="create-task-box">
+    <input
+      type="text"
+      class="create-task-input"
+      [value]="newTaskTitle()"
+      (input)="newTaskTitle.set($any($event.target).value)"
+      (keyup.enter)="addTask()"
+      placeholder="Create a new task..."
+      aria-label="New task title"
+    />
+    <button type="button" class="create-task-btn" (click)="addTask()" [disabled]="!newTaskTitle().trim()">
+      Add task
+    </button>
+  </div>
+
   <!-- Focus Tasks -->
   <div class="tasks-section">
     @if (loading()) {
