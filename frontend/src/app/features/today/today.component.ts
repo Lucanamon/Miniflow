@@ -65,19 +65,14 @@ export class TodayComponent implements OnInit {
   private loadTasks(): void {
     this.loading.set(true);
     if (this.auth.isLoggedIn()) {
-      // Load from storage first so Quick Actions tasks (saved to storage) are visible immediately
-      const key = this.getTasksKey();
-      const stored = this.storage.get<Array<{ id: number | string; title: string; board: string; dueTime?: string; completed: boolean }>>(key);
-      const fromStorage = stored && stored.length > 0 ? stored.map(t => ({ ...t, id: String(t.id) })) as Task[] : [];
-
+      // Backend is source of truth when logged in
       this.api.getTasks().subscribe({
         next: (apiTasks) => {
-          const fromApi = this.apiTasksToTasks(apiTasks);
-          this.tasks.set(this.mergeTasks(fromApi, fromStorage));
+          this.tasks.set(this.apiTasksToTasks(apiTasks));
           this.loading.set(false);
         },
         error: () => {
-          this.tasks.set(fromStorage.length > 0 ? fromStorage : DEFAULT_TASKS);
+          this.fallbackToStorage();
           this.loading.set(false);
         }
       });
@@ -87,15 +82,6 @@ export class TodayComponent implements OnInit {
       this.tasks.set(stored && stored.length > 0 ? stored.map(t => ({ ...t, id: String(t.id) })) : DEFAULT_TASKS);
       this.loading.set(false);
     }
-  }
-
-  /** Merge API tasks with storage tasks so Quick Actions tasks (saved to storage) appear on Today */
-  private mergeTasks(apiTasks: Task[], storageTasks: Task[]): Task[] {
-    const byId = new Map(apiTasks.map(t => [t.id, t]));
-    for (const t of storageTasks) {
-      if (!byId.has(t.id)) byId.set(t.id, t);
-    }
-    return Array.from(byId.values());
   }
 
   private apiTasksToTasks(apiTasks: ApiTask[]): Task[] {

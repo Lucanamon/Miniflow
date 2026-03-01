@@ -1,8 +1,8 @@
 .sky-page {
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--dashboard-section-gap);
+  gap: var(--spacing-sm);
   min-height: 100vh;
   min-width: 1280px;
   position: relative;
@@ -62,17 +62,21 @@
   }
 }
 
-/* Constellation section - radial nav hero */
+/* Constellation section - radial nav hero, compact vertical spacing */
 .constellation-section {
   width: 100%;
   display: flex;
   justify-content: center;
   min-height: 520px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
-/* Dashboard Section - density spacing (32-48px gap) */
+/* Dashboard Section (quote banner) - tight to constellation */
 .dashboard-section {
   width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* Dashboard cards row: Progress, Activity */

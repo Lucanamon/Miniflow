@@ -72,6 +72,27 @@ export interface DeleteTaskResponse {
   message: string;
 }
 
+export interface ApiBoard {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string | null;
+  color: string;
+  createdAt?: string;
+}
+
+export interface CreateBoardRequest {
+  name: string;
+  description?: string;
+  color?: string;
+}
+
+export interface UpdateBoardRequest {
+  name?: string;
+  description?: string;
+  color?: string;
+}
+
 type AuthHeaders = { headers?: Record<string, string> };
 
 @Injectable({
@@ -194,6 +215,42 @@ export class ApiService {
   deleteTask(id: string): Observable<DeleteTaskResponse> {
     return this.http
       .delete<DeleteTaskResponse>(this.baseUrl + '/tasks/' + id, this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
+  }
+
+  getBoards(): Observable<ApiBoard[]> {
+    return this.http.get<ApiBoard[]>(this.baseUrl + '/boards', this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  createBoard(data: CreateBoardRequest): Observable<ApiBoard> {
+    return this.http.post<ApiBoard>(this.baseUrl + '/boards', data, this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
+  }
+
+  updateBoard(id: string, data: UpdateBoardRequest): Observable<ApiBoard> {
+    return this.http
+      .patch<ApiBoard>(this.baseUrl + '/boards/' + encodeURIComponent(id), data, this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
+  }
+
+  deleteBoard(id: string): Observable<{ message: string }> {
+    return this.http
+      .delete<{ message: string }>(this.baseUrl + '/boards/' + encodeURIComponent(id), this.authOptions())
       .pipe(
         catchError((e) => {
           this.handleError(e);

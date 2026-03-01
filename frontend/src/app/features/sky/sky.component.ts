@@ -24,7 +24,7 @@ interface Task {
 }
 
 interface Board {
-  id: number;
+  id: string;
   name: string;
   description: string;
   taskCount: number;

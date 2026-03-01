@@ -15,6 +15,50 @@ $line-color: rgba(244, 208, 63, 0.5);
   height: 520px;
   margin: 0 auto;
   flex-shrink: 0;
+  overflow: visible;
+}
+
+/* ----- Dark galaxy disc behind constellation ----- */
+.galaxy-disc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 480px;
+  height: 480px;
+  margin-left: -240px;
+  margin-top: -240px;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+
+  /* Dark circle with galaxy-style radial gradient: deeper center, subtle purple/blue nebula edge */
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    rgba(6, 4, 16, 0.95) 0%,
+    rgba(14, 10, 30, 0.9) 22%,
+    rgba(24, 16, 48, 0.78) 48%,
+    rgba(38, 26, 65, 0.52) 72%,
+    rgba(55, 40, 85, 0.28) 88%,
+    transparent 100%
+  );
+  box-shadow:
+    inset 0 0 100px rgba(0, 0, 0, 0.7),
+    inset 0 0 160px rgba(70, 50, 130, 0.06),
+    0 0 0 1px rgba(125, 211, 252, 0.05),
+    0 0 120px rgba(90, 60, 140, 0.12),
+    0 0 200px rgba(60, 40, 100, 0.08);
+  animation: galaxyDiscPulse 20s ease-in-out infinite;
+}
+
+@keyframes galaxyDiscPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-disc {
+    animation: none;
+  }
 }
 
 /* ----- Star Dust (optional ambient background) ----- */

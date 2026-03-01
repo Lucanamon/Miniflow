@@ -1,4 +1,7 @@
 <div class="constellation-map" [style.--core-glow-intensity]="coreGlowIntensity">
+  <!-- Dark galaxy disc behind constellation -->
+  <div class="galaxy-disc" aria-hidden="true"></div>
+
   <!-- Optional background star dust -->
   @for (star of starDust; track star.id) {
     <div

@@ -6,9 +6,10 @@ import { EncouragementService } from '../../core/services/encouragement.service'
 import { StorageService } from '../../core/services/storage.service';
 import { ActivityService } from '../../core/services/activity.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ApiService } from '../../core/services/api.service';
 
 interface Board {
-  id: number;
+  id: string;
   name: string;
   description: string;
   taskCount: number;
@@ -29,8 +30,8 @@ export class ConstellationsComponent {
   private encouragementService = inject(EncouragementService);
   private activityService = inject(ActivityService);
   private authService = inject(AuthService);
+  private api = inject(ApiService);
 
-  /** Per-user storage key so each user only sees their own boards */
   private storageKey = computed(() => {
     const user = this.authService.getUser();
     const suffix = user?.id ?? 'anonymous';
@@ -49,14 +50,11 @@ export class ConstellationsComponent {
   emptyStateMessage = signal('');
 
   constructor() {
-    // Load boards for the current user when user (storage key) changes
     effect(() => {
-      const key = this.storageKey();
-      const stored = this.storage.get<Board[]>(key);
-      this.boards.set(stored ?? []);
+      this.storageKey();
+      this.loadBoards();
     });
 
-    // Persist boards to the current user's key whenever boards change (depend only on boards so we don't write old data to new user's key on login)
     effect(() => {
       this.storage.set(this.storageKey(), this.boards());
     });
@@ -64,55 +62,118 @@ export class ConstellationsComponent {
     this.emptyStateMessage.set(this.encouragementService.getRandomEmptyStateMessage());
   }
 
-  createBoard() {
-    if (this.newBoardName().trim()) {
-      const newBoard: Board = {
-        id: Date.now(), // Use timestamp for unique IDs
-        name: this.newBoardName(),
-        description: this.newBoardDescription(),
-        taskCount: 0,
-        color: 'blue'
-      };
+  private loadBoards(): void {
+    if (this.authService.isLoggedIn()) {
+      const fromStorage = this.storage.get<Board[]>(this.storageKey()) ?? [];
+      this.api.getBoards().subscribe({
+        next: (apiBoards) => {
+          const fromApi = this.apiBoardsToBoards(apiBoards);
+          this.boards.set(this.mergeBoards(fromApi, fromStorage));
+        },
+        error: () => this.boards.set(fromStorage.length > 0 ? fromStorage : [])
+      });
+    } else {
+      const stored = this.storage.get<Board[]>(this.storageKey());
+      this.boards.set(stored ?? []);
+    }
+  }
+
+  /** Merge API boards with storage so locally created boards stay visible after refresh if API was empty */
+  private mergeBoards(apiBoards: Board[], storageBoards: Board[]): Board[] {
+    const byId = new Map(apiBoards.map(b => [b.id, b]));
+    for (const b of storageBoards) {
+      if (!byId.has(b.id)) byId.set(b.id, b);
+    }
+    return Array.from(byId.values());
+  }
+
+  private apiBoardsToBoards(apiBoards: { id: string; name: string; description?: string | null; color: string }[]): Board[] {
+    return apiBoards.map(b => ({
+      id: b.id,
+      name: b.name,
+      description: b.description ?? '',
+      taskCount: 0,
+      color: b.color ?? 'blue'
+    }));
+  }
+
+  createBoard(): void {
+    const name = this.newBoardName().trim();
+    if (!name) return;
+
+    if (this.authService.isLoggedIn()) {
+      this.api.createBoard({ name, description: this.newBoardDescription() || undefined, color: 'blue' }).subscribe({
+        next: (created) => {
+          this.boards.update(boards => [...boards, this.apiBoardsToBoards([created])[0]]);
+          this.activityService.logBoardUpdated(name);
+          this.newBoardName.set('');
+          this.newBoardDescription.set('');
+          this.showCreateModal.set(false);
+        },
+        error: () => {
+          const newBoard: Board = { id: String(Date.now()), name, description: this.newBoardDescription(), taskCount: 0, color: 'blue' };
+          this.boards.update(boards => [...boards, newBoard]);
+          this.newBoardName.set('');
+          this.newBoardDescription.set('');
+          this.showCreateModal.set(false);
+        }
+      });
+    } else {
+      const newBoard: Board = { id: String(Date.now()), name, description: this.newBoardDescription(), taskCount: 0, color: 'blue' };
       this.boards.update(boards => [...boards, newBoard]);
-      // Auto-saved by effect()
       this.newBoardName.set('');
       this.newBoardDescription.set('');
       this.showCreateModal.set(false);
     }
   }
 
-  deleteBoard(id: number) {
-    this.boards.update(boards => boards.filter(board => board.id !== id));
-    // Auto-saved by effect()
+  deleteBoard(id: string): void {
+    if (this.authService.isLoggedIn()) {
+      this.api.deleteBoard(id).subscribe({
+        next: () => this.boards.update(boards => boards.filter(b => b.id !== id)),
+        error: () => this.boards.update(boards => boards.filter(b => b.id !== id))
+      });
+    } else {
+      this.boards.update(boards => boards.filter(b => b.id !== id));
+    }
   }
 
-  openEditBoard(board: Board) {
+  openEditBoard(board: Board): void {
     this.editingBoard.set(board);
     this.editBoardName.set(board.name);
     this.editBoardDescription.set(board.description);
     this.showEditModal.set(true);
   }
 
-  closeEditModal() {
+  closeEditModal(): void {
     this.showEditModal.set(false);
     this.editingBoard.set(null);
     this.editBoardName.set('');
     this.editBoardDescription.set('');
   }
 
-  saveEditBoard() {
+  saveEditBoard(): void {
     const board = this.editingBoard();
     const name = this.editBoardName().trim();
     if (!board || !name) return;
-    this.boards.update(boards =>
-      boards.map(b =>
-        b.id === board.id
-          ? { ...b, name, description: this.editBoardDescription() }
-          : b
-      )
-    );
-    // Log board update activity
-    this.activityService.logBoardUpdated(name);
-    this.closeEditModal();
+
+    if (this.authService.isLoggedIn()) {
+      this.api.updateBoard(board.id, { name, description: this.editBoardDescription() }).subscribe({
+        next: () => {
+          this.boards.update(boards =>
+            boards.map(b => (b.id === board.id ? { ...b, name, description: this.editBoardDescription() } : b))
+          );
+          this.activityService.logBoardUpdated(name);
+          this.closeEditModal();
+        },
+        error: () => this.closeEditModal()
+      });
+    } else {
+      this.boards.update(boards =>
+        boards.map(b => (b.id === board.id ? { ...b, name, description: this.editBoardDescription() } : b))
+      );
+      this.activityService.logBoardUpdated(name);
+      this.closeEditModal();
+    }
   }
 }
