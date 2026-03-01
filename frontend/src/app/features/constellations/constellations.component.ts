@@ -1,10 +1,11 @@
-import { Component, signal, effect, inject } from '@angular/core';
+import { Component, signal, effect, inject, computed } from '@angular/core';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { EncouragementService } from '../../core/services/encouragement.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ActivityService } from '../../core/services/activity.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface Board {
   id: number;
@@ -14,7 +15,7 @@ interface Board {
   color: string;
 }
 
-const STORAGE_KEY_BOARDS = 'miniflow_boards';
+const STORAGE_KEY_PREFIX = 'miniflow_boards';
 
 @Component({
   selector: 'app-constellations',
@@ -27,14 +28,16 @@ export class ConstellationsComponent {
   private storage = inject(StorageService);
   private encouragementService = inject(EncouragementService);
   private activityService = inject(ActivityService);
+  private authService = inject(AuthService);
 
-  // Load boards from storage on init, fallback to defaults
-  boards = signal<Board[]>(
-    this.storage.get<Board[]>(STORAGE_KEY_BOARDS) ?? [
-      { id: 1, name: 'Work Projects', description: 'Professional tasks and projects', taskCount: 8, color: 'blue' },
-      { id: 2, name: 'Personal Goals', description: 'Life goals and personal development', taskCount: 5, color: 'green' }
-    ]
-  );
+  /** Per-user storage key so each user only sees their own boards */
+  private storageKey = computed(() => {
+    const user = this.authService.getUser();
+    const suffix = user?.id ?? 'anonymous';
+    return `${STORAGE_KEY_PREFIX}_${suffix}`;
+  });
+
+  boards = signal<Board[]>([]);
 
   showCreateModal = signal(false);
   newBoardName = signal('');
@@ -46,9 +49,16 @@ export class ConstellationsComponent {
   emptyStateMessage = signal('');
 
   constructor() {
-    // Auto-save boards whenever they change
+    // Load boards for the current user when user (storage key) changes
     effect(() => {
-      this.storage.set(STORAGE_KEY_BOARDS, this.boards());
+      const key = this.storageKey();
+      const stored = this.storage.get<Board[]>(key);
+      this.boards.set(stored ?? []);
+    });
+
+    // Persist boards to the current user's key whenever boards change (depend only on boards so we don't write old data to new user's key on login)
+    effect(() => {
+      this.storage.set(this.storageKey(), this.boards());
     });
 
     this.emptyStateMessage.set(this.encouragementService.getRandomEmptyStateMessage());
