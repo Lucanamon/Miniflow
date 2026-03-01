@@ -93,6 +93,18 @@ export interface UpdateBoardRequest {
   color?: string;
 }
 
+export interface ApiActivity {
+  id: string;
+  type: string;
+  title: string;
+  timestamp: string;
+}
+
+export interface CreateActivityRequest {
+  type: string;
+  title: string;
+}
+
 type AuthHeaders = { headers?: Record<string, string> };
 
 @Injectable({
@@ -256,5 +268,23 @@ export class ApiService {
           this.handleError(e);
         })
       );
+  }
+
+  getActivities(count: number = 10): Observable<ApiActivity[]> {
+    return this.http
+      .get<ApiActivity[]>(this.baseUrl + '/activities?count=' + Math.min(50, Math.max(1, count)), this.authOptions())
+      .pipe(
+        catchError((e) => {
+          this.handleError(e);
+        })
+      );
+  }
+
+  createActivity(data: CreateActivityRequest): Observable<ApiActivity> {
+    return this.http.post<ApiActivity>(this.baseUrl + '/activities', data, this.authOptions()).pipe(
+      catchError((e) => {
+        this.handleError(e);
+      })
+    );
   }
 }

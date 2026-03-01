@@ -161,6 +161,7 @@ export class SkyComponent implements OnInit, OnDestroy {
     this.quickTaskTitle.set('');
   }
 
+  /** Same backend path as Today: POST /tasks with board: 'Today' and dueTime (ISO). */
   confirmAddTask(): void {
     const title = this.quickTaskTitle().trim();
     if (!title) {
@@ -169,7 +170,8 @@ export class SkyComponent implements OnInit, OnDestroy {
     }
     const dateStr = this.taskDraftDate();
     const timeStr = this.taskDraftTime();
-    const dueTime = this.formatDueTime(dateStr, timeStr);
+    const dueTimeDisplay = this.formatDueTime(dateStr, timeStr);
+    const dueTimeIso = this.toISODateTime(dateStr, timeStr);
 
     const tasksKey = this.getTasksKey();
     const existing = this.storage.get<Task[]>(tasksKey) ?? [];
@@ -177,11 +179,11 @@ export class SkyComponent implements OnInit, OnDestroy {
       id: String(Date.now()),
       title,
       board: 'Today',
-      dueTime,
+      dueTime: dueTimeDisplay,
       completed: false
     };
     if (this.auth.isLoggedIn()) {
-      this.api.createTask({ title, board: 'Today', dueTime, completed: false }).subscribe({
+      this.api.createTask({ title, board: 'Today', dueTime: dueTimeIso, completed: false }).subscribe({
         next: (created) => {
           this.storage.set(tasksKey, [...existing, { ...newTask, id: created.id }]);
           this.activityService.logTaskCreated(title);
@@ -199,6 +201,14 @@ export class SkyComponent implements OnInit, OnDestroy {
       this.updateStats();
     }
     this.closeDateTimePicker();
+  }
+
+  /** ISO string for API (same as Today; backend expects DateTime). */
+  private toISODateTime(dateStr: string, timeStr: string): string {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const d = new Date(dateStr);
+    d.setHours(hours, minutes, 0, 0);
+    return d.toISOString();
   }
 
   private formatDueTime(dateStr: string, timeStr: string): string {

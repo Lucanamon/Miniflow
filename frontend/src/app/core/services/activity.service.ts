@@ -1,6 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 import { AuthService } from './auth.service';
+import { ApiService } from './api.service';
 
 export type ActivityType = 'completed' | 'created' | 'board_updated' | 'deleted';
 
@@ -20,6 +21,7 @@ const MAX_ACTIVITIES = 10; // Keep last 10 activities
 export class ActivityService {
   private storage = inject(StorageService);
   private auth = inject(AuthService);
+  private api = inject(ApiService);
 
   // Signal for reactive updates (per-user)
   readonly activities = signal<ActivityEvent[]>([]);
@@ -36,7 +38,24 @@ export class ActivityService {
 
   /** Reload activities for the current user (call after login/logout) */
   reloadForCurrentUser(): void {
-    this.activities.set(this.loadActivities());
+    if (this.auth.isLoggedIn()) {
+      this.api.getActivities(MAX_ACTIVITIES).subscribe({
+        next: (list) => {
+          const events: ActivityEvent[] = list.map((a) => ({
+            id: a.id,
+            type: a.type as ActivityType,
+            title: a.title,
+            timestamp: new Date(a.timestamp),
+          }));
+          this.activities.set(events);
+        },
+        error: () => {
+          this.activities.set(this.loadActivities());
+        },
+      });
+    } else {
+      this.activities.set(this.loadActivities());
+    }
   }
 
   /**
@@ -69,21 +88,44 @@ export class ActivityService {
   }
 
   /**
-   * Add a new activity event
+   * Add a new activity event (persists to backend when logged in, else localStorage)
    */
   addActivity(type: ActivityType, title: string): void {
+    if (this.auth.isLoggedIn()) {
+      this.api.createActivity({ type, title }).subscribe({
+        next: (a) => {
+          const newActivity: ActivityEvent = {
+            id: a.id,
+            type: a.type as ActivityType,
+            title: a.title,
+            timestamp: new Date(a.timestamp),
+          };
+          const current = this.activities();
+          const updated = [newActivity, ...current]
+            .sort((x, y) => y.timestamp.getTime() - x.timestamp.getTime())
+            .slice(0, MAX_ACTIVITIES);
+          this.activities.set(updated);
+        },
+        error: () => {
+          this.addActivityLocal(type, title);
+        },
+      });
+    } else {
+      this.addActivityLocal(type, title);
+    }
+  }
+
+  private addActivityLocal(type: ActivityType, title: string): void {
     const newActivity: ActivityEvent = {
       id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
       title,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
-
     const current = this.activities();
     const updated = [newActivity, ...current]
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, MAX_ACTIVITIES);
-
     this.activities.set(updated);
     this.saveActivities(updated);
   }

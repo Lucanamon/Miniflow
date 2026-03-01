@@ -7,6 +7,28 @@
     </div>
   </div>
 
+  <!-- Date/Time Picker (same as Sky Quick actions) -->
+  @if (showDateTimePicker()) {
+    <section class="date-time-picker-section">
+      <app-card title="Set date &amp; time" variant="default">
+        <div class="task-picker-fields">
+          <label class="task-picker-label">
+            <span>Date</span>
+            <input type="date" [ngModel]="taskDraftDate()" (ngModelChange)="taskDraftDate.set($event)" class="task-picker-input" />
+          </label>
+          <label class="task-picker-label">
+            <span>Time</span>
+            <input type="time" [ngModel]="taskDraftTime()" (ngModelChange)="taskDraftTime.set($event)" class="task-picker-input" />
+          </label>
+        </div>
+        <div class="task-picker-actions">
+          <app-button variant="outline" size="md" (click)="closeDateTimePicker()">Cancel</app-button>
+          <app-button variant="primary" size="md" (click)="confirmAddTask()">Add task</app-button>
+        </div>
+      </app-card>
+    </section>
+  }
+
   <!-- Create task box -->
   <div class="create-task-box">
     <input
@@ -50,7 +72,7 @@
               <div class="task-meta">
                 <span class="task-board">{{ task.board }}</span>
                 @if (task.dueTime) {
-                  <span class="task-time">{{ task.dueTime }}</span>
+                  <span class="task-time">{{ formatDueTimeForDisplay(task.dueTime) }}</span>
                 }
               </div>
             </div>
