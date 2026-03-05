@@ -80,3 +80,10 @@
 .card-content {
   color: var(--text-primary);
 }
+
+/* Andromeda theme: card titles should be black for clearer contrast on light cards,
+   while other text continues to use the theme text colors. Use :host-context so this
+   works correctly with Angular view encapsulation. */
+:host-context(body.theme-andromeda) .card-title {
+  color: #000000;
+}

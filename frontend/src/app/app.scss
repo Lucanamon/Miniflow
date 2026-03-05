@@ -218,6 +218,31 @@
   }
 }
 
+/* Andromeda theme-specific tweaks */
+
+body.theme-andromeda .banner {
+  /* Ensure header uses the dark grey gradient from the theme variables */
+  background: var(--navbar-gradient);
+}
+
+body.theme-andromeda .logo-text {
+  /* Header title in white for strong contrast on dark header */
+  color: #ffffff;
+}
+
+body.theme-andromeda .main-nav .nav-item,
+body.theme-andromeda .header-login-link,
+body.theme-andromeda .user-email,
+body.theme-andromeda .logout-button {
+  /* Make all header/nav names bright white in Andromeda */
+  color: #ffffff;
+}
+
+body.theme-andromeda .page-title {
+  /* In Andromeda, main page titles should be black for a crisp mono look */
+  color: #000000;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .main-nav {

@@ -17,6 +17,11 @@
   color: var(--text-primary);
 }
 
+/* Andromeda theme: ensure My Note page title is black, overriding default text color */
+:host-context(body.theme-andromeda) .page-title {
+  color: #000000;
+}
+
 .page-subtitle {
   margin: 0;
   color: var(--text-muted);
@@ -92,6 +97,8 @@
     opacity: 0.7;
   }
 }
+
+/* (Card title color for Andromeda is handled globally in card.component.scss) */
 
 /* Empty State */
 .empty-state {

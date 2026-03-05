@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { EncouragementService } from '../../core/services/encouragement.service';
 import { StorageService } from '../../core/services/storage.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ApiService, ApiTask } from '../../core/services/api.service';
+import { ApiService, ApiTask, ApiError } from '../../core/services/api.service';
 import { ActivityService } from '../../core/services/activity.service';
 import { ButtonComponent } from '../../shared/components/button.component';
 import { CardComponent } from '../../shared/components/card/card.component';
@@ -164,17 +164,16 @@ export class TodayComponent implements OnInit {
     const task = this.tasks().find(t => t.id === id);
     const taskTitle = task?.title || 'Task';
 
+    // Optimistically remove the task locally and log activity.
+    this.tasks.update(tasks => tasks.filter(t => t.id !== id));
+    this.activityService.logTaskDeleted(taskTitle);
+
     if (this.auth.isLoggedIn()) {
+      // Fire-and-forget backend delete; keep local delete even if it fails.
       this.api.deleteTask(id).subscribe({
-        next: () => {
-          this.tasks.update(tasks => tasks.filter(t => t.id !== id));
-          this.activityService.logTaskDeleted(taskTitle);
-        },
-        error: () => this.loadTasks()
+        next: () => {},
+        error: () => {}
       });
-    } else {
-      this.tasks.update(tasks => tasks.filter(t => t.id !== id));
-      this.activityService.logTaskDeleted(taskTitle);
     }
   }
 

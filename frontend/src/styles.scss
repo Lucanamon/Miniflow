@@ -26,7 +26,7 @@
   --white-off: #e8eaed;
   --white-pure: #ffffff;
 
-  /* Text Colors */
+  /* Text Colors (overridden by theme classes) */
   --text-primary: var(--white-soft);
   --text-secondary: rgba(248, 249, 250, 0.8);
   --text-muted: rgba(248, 249, 250, 0.6);
@@ -37,7 +37,7 @@
   --violet-medium: #3d2a5a;
   --violet-light: #4a3a6a;
 
-  /* Background Gradients */
+  /* Background Gradients (overridden by theme classes) */
   --bg-gradient: linear-gradient(90deg, var(--violet-deep) 0%, var(--violet-dark) 35%, var(--violet-medium) 65%, var(--violet-dark) 100%);
   --navbar-gradient: linear-gradient(180deg, var(--indigo-base) 0%, var(--indigo-dark) 45%, var(--indigo-darker) 100%);
 
@@ -130,6 +130,47 @@
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-family-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Theme variants */
+
+body.theme-sky {
+  /* Existing "Sky" starry-night palette */
+  --bg-gradient: linear-gradient(
+    90deg,
+    var(--violet-deep) 0%,
+    var(--violet-dark) 35%,
+    var(--violet-medium) 65%,
+    var(--violet-dark) 100%
+  );
+  --navbar-gradient: linear-gradient(
+    180deg,
+    var(--indigo-base) 0%,
+    var(--indigo-dark) 45%,
+    var(--indigo-darker) 100%
+  );
+  --text-primary: var(--white-soft);
+  --text-secondary: rgba(248, 249, 250, 0.8);
+  --text-muted: rgba(248, 249, 250, 0.6);
+}
+
+body.theme-andromeda {
+  /* Mono white/black "Andromeda" palette.
+     Slightly darker neutral background with soft horizontal grey gradient toward the center
+     so the page is less bright, dark header bar, keep center card colors as-is. */
+  --bg-gradient: linear-gradient(
+    90deg,
+    #f3f4f6 0%,
+    #e5e7eb 20%,
+    #d1d5db 50%,
+    #e5e7eb 80%,
+    #f3f4f6 100%
+  );
+  --navbar-gradient: linear-gradient(180deg, #111827 0%, #4b5563 100%);
+  /* Use light text colors so names and titles read clearly on dark cards/header */
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
 }
 
 * {

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -11,8 +12,40 @@ import { CardComponent } from '../../shared/components/card/card.component';
         <h1 class="page-title">Settings</h1>
         <p class="page-subtitle">Configure your Miniflow experience</p>
       </div>
-      <app-card title="Settings" subtitle="Coming soon">
-        <p>Settings configuration will be available here.</p>
+
+      <app-card title="Theme" subtitle="Choose how Miniflow looks">
+        <div class="setting-group">
+          <h2 class="setting-label">Color theme</h2>
+          <p class="setting-description">
+            Switch between the default <strong>Sky</strong> theme and a mono white / black
+            <strong>Andromeda</strong> theme with a white background and black header.
+          </p>
+          <div class="theme-options">
+            <button
+              type="button"
+              class="theme-chip"
+              [class.selected]="currentTheme() === 'sky'"
+              (click)="setTheme('sky')"
+            >
+              <span class="theme-dot theme-dot-sky"></span>
+              <span class="theme-chip-title">Sky</span>
+              <span class="theme-chip-subtitle">Current colorful starry palette</span>
+            </button>
+
+            <button
+              type="button"
+              class="theme-chip"
+              [class.selected]="currentTheme() === 'andromeda'"
+              (click)="setTheme('andromeda')"
+            >
+              <span class="theme-dot theme-dot-andromeda"></span>
+              <span class="theme-chip-title">Andromeda</span>
+              <span class="theme-chip-subtitle">
+                White background, black header bar, center cards keep their existing colors
+              </span>
+            </button>
+          </div>
+        </div>
       </app-card>
     </div>
   `,
@@ -88,6 +121,108 @@ import { CardComponent } from '../../shared/components/card/card.component';
     p {
       color: var(--text-muted);
     }
+
+    .setting-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .setting-label {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .setting-description {
+      font-size: 0.9rem;
+      max-width: 36rem;
+    }
+
+    .theme-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-xs);
+    }
+
+    .theme-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 0.5rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.4);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      min-width: 0;
+    }
+
+    .theme-chip:hover {
+      border-color: rgba(125, 211, 252, 0.6);
+      box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.4);
+    }
+
+    .theme-chip.selected {
+      border-color: rgba(125, 211, 252, 0.9);
+      background: radial-gradient(circle at 0% 0%, rgba(125, 211, 252, 0.18), rgba(15, 23, 42, 0.7));
+      color: var(--text-primary);
+      box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.8);
+    }
+
+    .theme-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      flex-shrink: 0;
+      border: 2px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.5);
+    }
+
+    .theme-dot-sky {
+      background: radial-gradient(circle at 30% 0%, #f4d03f, #7dd3fc);
+    }
+
+    .theme-dot-andromeda {
+      background: conic-gradient(from 45deg, #000 0deg, #000 180deg, #fff 181deg, #fff 360deg);
+    }
+
+    .theme-chip-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .theme-chip-subtitle {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 16rem;
+    }
+
+    @media (max-width: 600px) {
+      .theme-options {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .theme-chip {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
   `]
 })
-export class SettingsComponent {}
+export class SettingsComponent {
+  private themeService = inject(ThemeService);
+
+  readonly currentTheme = computed(() => this.themeService.currentTheme());
+
+  setTheme(theme: 'sky' | 'andromeda'): void {
+    this.themeService.setTheme(theme);
+  }
+}
